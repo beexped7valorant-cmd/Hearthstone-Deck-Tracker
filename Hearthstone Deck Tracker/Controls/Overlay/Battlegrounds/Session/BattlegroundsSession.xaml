@@ -36,6 +36,22 @@
                 <StackPanel.OpacityMask>
                     <VisualBrush Visual="{Binding ElementName=BorderMask}" />
                 </StackPanel.OpacityMask>
+                <StackPanel Background="#202429">
+                    <StackPanel.Resources>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextWrapping" Value="Wrap"/>
+                            <Setter Property="Margin" Value="8,4"/>
+                            <Setter Property="FontSize" Value="12"/>
+                            <Style.Triggers>
+                                <Trigger Property="Text" Value="">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Resources>
+                    <TextBlock Text="{Binding LevelAdvice, TargetNullValue=''}" Foreground="#FFD68C" Margin="8,5,29,3"/>
+                    <TextBlock Text="{Binding GiftAdvice, TargetNullValue=''}" Foreground="#DFB8FF"/>
+                </StackPanel>
                 <StackPanel
                     Orientation="Vertical"
                 >

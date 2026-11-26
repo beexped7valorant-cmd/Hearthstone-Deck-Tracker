@@ -52,6 +52,8 @@ namespace HDTTests.Battlegrounds
 
 			CollectionAssert.Contains(db.GetCards(3, Race.BEAST, false).Select(x => x.DbfId).ToList(), beast.DbfId);
 			Assert.IsFalse(db.GetCards(1, Race.BEAST, false).Any());
+			Assert.AreEqual(3, db.LobbyCardTiers[beast.DbfId]);
+			Assert.IsFalse(db.LobbyCardTiers.ContainsKey(leftOut.DbfId));
 			CollectionAssert.Contains(db.GetCards(2, Race.INVALID, false).Select(x => x.DbfId).ToList(), neutral.DbfId);
 			CollectionAssert.AreEquivalent(new[] { spell.DbfId }, db.GetSpells(4, false).Select(x => x.DbfId).ToList());
 			Assert.IsFalse(db.GetSpells(1, false).Any());
@@ -86,6 +88,7 @@ namespace HDTTests.Battlegrounds
 
 			CollectionAssert.AreEquivalent(new[] { allowed.DbfId }, db.GetCardsByRaces(new[] { Race.BEAST }, false).Select(x => x.DbfId).ToList());
 			Assert.IsFalse(db.GetSpells(false).Any());
+			Assert.IsFalse(db.LobbyCardTiers.ContainsKey(banned.DbfId));
 			Assert.IsTrue(db.IsBanned(banned.DbfId));
 		}
 

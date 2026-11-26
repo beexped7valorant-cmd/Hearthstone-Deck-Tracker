@@ -42,6 +42,8 @@ public class BattlegroundsCompsGuidesViewModel : ViewModel
 	{
 		if(IsPreLobby)
 			OnPreLobby();
+		else
+			RefreshLobbyCoreCards();
 	}
 
 	public ICommand RetryCommand { get; }
@@ -234,15 +236,66 @@ public class BattlegroundsCompsGuidesViewModel : ViewModel
 		private set => SetProp(value);
 	}
 
+	private Guid? _guidesGameId;
+
+	public IReadOnlyList<LobbyCoreCard> LobbyCoreCards
+	{
+		get => GetProp<IReadOnlyList<LobbyCoreCard>>(Array.Empty<LobbyCoreCard>())!;
+		private set
+		{
+			SetProp(value);
+			OnPropertyChanged(nameof(HasLobbyCoreCards));
+		}
+	}
+
+	public bool HasLobbyCoreCards => LobbyCoreCards.Count > 0;
+
+	public sealed class LobbyCoreCard
+	{
+		public Hearthstone.Card Card { get; }
+		public int Tier { get; }
+		public string Compositions { get; }
+
+		internal LobbyCoreCard(Hearthstone.Card card, int tier, IEnumerable<string> compositions)
+		{
+			Card = card;
+			Tier = tier;
+			Compositions = string.Join(" · ", compositions.Distinct().OrderBy(name => name));
+		}
+	}
+
+	private void RefreshLobbyCoreCards()
+	{
+		if(IsPreLobby || HasError || _guidesGameId == null || _guidesGameId != Core.Game.CurrentGameStats?.GameId
+			|| CompsByTier == null || !(HSReplayNetOAuth.AccountData?.IsTier7 == true || Tier7Trial.IsTrialForCurrentGameActive(Core.Game.MetaData.ServerInfo?.GameHandle))
+			|| BattlegroundsDbSingleton.Current.LobbyCardTiers is not { } pool)
+		{
+			LobbyCoreCards = Array.Empty<LobbyCoreCard>();
+			return;
+		}
+
+		var guides = CompsByTier.Values.SelectMany(group => group.Comps ?? Enumerable.Empty<BattlegroundsCompGuideViewModel>());
+		LobbyCoreCards = guides.SelectMany(g => g.CompGuide.CoreCards.Select(id => (id, g.CompGuide.Name)))
+			.Where(entry => pool.ContainsKey(entry.id))
+			.GroupBy(entry => entry.id)
+			.Select(group => Database.GetCardFromDbfId(group.Key, false) is { IsKnownCard: true } card
+				? new LobbyCoreCard(card, pool[group.Key], group.Select(entry => entry.Name)) : null)
+			.OfType<LobbyCoreCard>()
+			.OrderBy(row => row.Tier).ThenBy(row => row.Card.LocalizedName).ToList();
+	}
+
 	public void OnMinionPoolChanged()
 	{
 		var comps = CompsByTier?.Values.Where(v => v.Comps != null).SelectMany(v => v.Comps!) ?? Comps;
 		foreach(var comp in comps ?? Enumerable.Empty<BattlegroundsCompGuideViewModel>())
 			comp.OnMinionPoolChanged();
+		RefreshLobbyCoreCards();
 	}
 
 	public async void OnMatchStart()
 	{
+		_guidesGameId = null;
+		LobbyCoreCards = Array.Empty<LobbyCoreCard>();
 		if(IsPreLobby)
 		{
 			IsPreLobby = false;
@@ -266,6 +319,8 @@ public class BattlegroundsCompsGuidesViewModel : ViewModel
 
 	public async void OnPreLobby()
 	{
+		_guidesGameId = null;
+		LobbyCoreCards = Array.Empty<LobbyCoreCard>();
 		IsPreLobby = true;
 		try
 		{
@@ -344,6 +399,7 @@ public class BattlegroundsCompsGuidesViewModel : ViewModel
 		Log.Debug("Fetching Premium Battlegrounds Comp Guides...");
 #endif
 
+		var gameId = IsPreLobby ? null : Core.Game.CurrentGameStats?.GameId;
 		Dictionary<int, TieredComps>? guides = null;
 		try
 		{
@@ -360,6 +416,8 @@ public class BattlegroundsCompsGuidesViewModel : ViewModel
 			Comps = null;
 			CompsByTier = guides;
 			HasError = false;
+			_guidesGameId = gameId;
+			RefreshLobbyCoreCards();
 		}
 		else if(!HasError)
 			HandleCompGuidesError("NoData", "Premium comp guides request returned no data");
@@ -367,6 +425,8 @@ public class BattlegroundsCompsGuidesViewModel : ViewModel
 
 	private async Task SetFreeCompGuides()
 	{
+		_guidesGameId = null;
+		LobbyCoreCards = Array.Empty<LobbyCoreCard>();
 #if(DEBUG)
 		Log.Debug("Fetching Battlegrounds Comp Guides...");
 #endif
@@ -393,6 +453,8 @@ public class BattlegroundsCompsGuidesViewModel : ViewModel
 
 	public void OnMatchEnd()
 	{
+		_guidesGameId = null;
+		LobbyCoreCards = Array.Empty<LobbyCoreCard>();
 		IsPreLobby = false;
 		CompsByTier = null;
 		SelectedComp = null;
@@ -449,6 +511,8 @@ public class BattlegroundsCompsGuidesViewModel : ViewModel
 
 	private void HandleCompGuidesError(string type, string message)
 	{
+		_guidesGameId = null;
+		LobbyCoreCards = Array.Empty<LobbyCoreCard>();
 		HasError = true;
 		Influx.OnGetBattlegroundsCompositionGuidesError(type, message);
 	}
@@ -462,6 +526,8 @@ public class BattlegroundsCompsGuidesViewModel : ViewModel
 
 	public void Reset()
 	{
+		_guidesGameId = null;
+		LobbyCoreCards = Array.Empty<LobbyCoreCard>();
 		IsPreLobby = false;
 		Comps = null;
 		CompsByTier = null;

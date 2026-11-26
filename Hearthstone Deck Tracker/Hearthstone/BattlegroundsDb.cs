@@ -44,6 +44,9 @@ public class BattlegroundsDb
 
 	private readonly HashSet<int> _bannedDbfIds = new();
 
+	// Only the server pool contains the exact tavern tiers and bans for this lobby.
+	public IReadOnlyDictionary<int, int>? LobbyCardTiers { get; private set; }
+
 	public bool IsBanned(int dbfId) => _bannedDbfIds.Contains(dbfId);
 
 	/// <summary>
@@ -78,6 +81,8 @@ public class BattlegroundsDb
 
 	private void Update(BattlegroundsMinionPool pool, BattlegroundsDb fallback)
 	{
+		LobbyCardTiers = pool.Cards.Where(e => !e.Banned && e.Tier > 0)
+			.GroupBy(e => e.DbfId).ToDictionary(g => g.Key, g => g.First().Tier);
 		var activeRaces = pool.ActiveMinionTypes.Cast<Race>().ToHashSet();
 		Races.UnionWith(fallback.Races);
 		Races.UnionWith(activeRaces);

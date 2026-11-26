@@ -86,6 +86,27 @@
                 <Border Grid.Row="1" BorderBrush="#4F565B" BorderThickness="1" CornerRadius="3" Background="#141617" ClipToBounds="True">
                     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" extensions:OverlayExtensions.IsOverlayHitTestVisible="True">
                         <StackPanel>
+                            <Expander Visibility="{Binding HasLobbyCoreCards, Converter={StaticResource BoolToVisibility}}"
+                                      Foreground="#F5D797" Padding="6" Header="{lex:Loc Battlegrounds_CompGuide_CoreCards}"
+                                      extensions:OverlayExtensions.IsOverlayHitTestVisible="True">
+                                <ItemsControl ItemsSource="{Binding LobbyCoreCards}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Padding="6,4" BorderBrush="#444850" BorderThickness="0,0,0,1">
+                                                <DockPanel ToolTip="{Binding Card.Text}">
+                                                    <TextBlock DockPanel.Dock="Left" Width="32" FontWeight="Bold"
+                                                               Foreground="#FFD68C" Text="{Binding Tier, StringFormat='T{0}'}"/>
+                                                    <StackPanel>
+                                                        <TextBlock Foreground="White" FontWeight="SemiBold" TextWrapping="Wrap" Text="{Binding Card.LocalizedName}"/>
+                                                        <TextBlock Foreground="#BEC7D1" FontSize="11" TextWrapping="Wrap" Text="{Binding Compositions}"/>
+                                                    </StackPanel>
+                                                </DockPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Expander>
+
                             <!-- Error State -->
                             <Border Visibility="{Binding ErrorVisibility}" Padding="16">
                                 <StackPanel  VerticalAlignment="Center" HorizontalAlignment="Center">

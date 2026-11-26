@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms</value>
+  </resheader>
+  <data name="LevelWindow">
+    <value>Turn {0} · T{1} on {2}</value>
+  </data>
+  <data name="InTurns">
+    <value>in {0} turn(s)</value>
+  </data>
+  <data name="NeedGold">
+    <value>need {0} more Gold</value>
+  </data>
+  <data name="Stabilize">
+    <value>strengthen your board first</value>
+  </data>
+  <data name="Late">
+    <value>level if the board can hold</value>
+  </data>
+  <data name="Consider">
+    <value>level if your board is stable</value>
+  </data>
+  <data name="GiftGold">
+    <value>Dark Gift · need {0} more Gold</value>
+  </data>
+  <data name="GiftTempo">
+    <value>Dark Gift · use before rolling if the shop has no immediate upgrade.</value>
+  </data>
+  <data name="GiftAfterLevel">
+    <value>Dark Gift · level first if following the curve. Spending now would delay it.</value>
+  </data>
+  <data name="GiftEarly">
+    <value>Dark Gift · use for tempo in a weak shop. With a strong board, save it for turn 7.</value>
+  </data>
+  <data name="GiftTribe">
+    <value>Dark Gift · use before rolling to look for your main tribe.</value>
+  </data>
+</root>

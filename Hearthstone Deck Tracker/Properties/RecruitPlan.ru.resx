@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms</value>
+  </resheader>
+  <data name="LevelWindow">
+    <value>Ход {0} · Т{1} на {2}</value>
+  </data>
+  <data name="InTurns">
+    <value>до окна: {0}</value>
+  </data>
+  <data name="NeedGold">
+    <value>не хватает {0} зол.</value>
+  </data>
+  <data name="Stabilize">
+    <value>сначала усиль стол</value>
+  </data>
+  <data name="Late">
+    <value>поднимай, если стол выдержит бой</value>
+  </data>
+  <data name="Consider">
+    <value>можно поднять при сильном столе</value>
+  </data>
+  <data name="GiftGold">
+    <value>Тёмный дар · не хватает {0} зол.</value>
+  </data>
+  <data name="GiftTempo">
+    <value>Тёмный дар · при слабой витрине жми до роллов, чтобы усилить стол.</value>
+  </data>
+  <data name="GiftAfterLevel">
+    <value>Тёмный дар · сначала ап, если идёшь по кривой. На оба действия золота мало.</value>
+  </data>
+  <data name="GiftEarly">
+    <value>Тёмный дар · жми для темпа при слабой витрине. Со стабильным столом сохрани до хода 7.</value>
+  </data>
+  <data name="GiftTribe">
+    <value>Тёмный дар · жми до роллов, если ищешь карту своего основного типа.</value>
+  </data>
+</root>

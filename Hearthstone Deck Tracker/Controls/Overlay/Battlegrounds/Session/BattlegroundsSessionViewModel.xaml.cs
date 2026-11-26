@@ -48,6 +48,46 @@ public class BattlegroundsSessionViewModel : ViewModel
 		private set => SetProp(value);
 	}
 
+	public string? LevelAdvice { get => GetProp<string?>(null); private set => SetProp(value); }
+	public string? GiftAdvice { get => GetProp<string?>(null); private set => SetProp(value); }
+
+	public void UpdateRecruitPlan()
+	{
+		var game = Core.Game;
+		if(game.IsInMenu || !game.IsBattlegroundsMatch || game.IsBattlegroundsCombatPhase || game.GetTurnNumber() < 1
+			|| game.Spectator || game.PlayerEntity is not { } player || game.Player.Hero is not { } hero
+			|| player.GetTag(GameTag.PLAYSTATE) != (int)PlayState.PLAYING)
+		{
+			ClearRecruitPlan();
+			return;
+		}
+
+		var tier = hero.GetTag(GameTag.PLAYER_TECH_LEVEL);
+		var turn = game.GetTurnNumber();
+		var life = hero.Health + hero.GetTag(GameTag.ARMOR);
+		var gold = player.GetTag(GameTag.RESOURCES) + player.GetTag(GameTag.TEMP_RESOURCES) - player.GetTag(GameTag.RESOURCES_USED);
+		var buttons = game.Player.Board.Where(e => e.GetTag(GameTag.CARDTYPE) == (int)CardType.GAME_MODE_BUTTON).ToList();
+		var upgrade = buttons.FirstOrDefault(e => e.CardId == $"TB_BaconShopTechUp0{tier + 1}_Button");
+		int? levelCost = upgrade != null && upgrade.Tags.TryGetValue(GameTag.COST, out var price) ? price : null;
+		var maxTier = game.GameEntity?.GetTag(GameTag.BACON_MAX_PLAYER_TECH_LEVEL) ?? 0;
+		LevelAdvice = player.HasTag(GameTag.BACON_NO_TIER_UP_BUTTON) ? null
+			: RecruitPlan.Level(turn, tier, maxTier > 0 ? maxTier : 6, gold, levelCost, life);
+
+		var gift = buttons.FirstOrDefault(e => e.CardId == HearthDb.CardIds.NonCollectible.Neutral.DarkDiscovery);
+		GiftAdvice = gift == null || game.GameEntity?.HasTag(GameTag.BACON_DARK_GIFTS_ACTIVE) != true ? null
+			: RecruitPlan.Gift(turn, tier, gold, gift.Tags.TryGetValue(GameTag.COST, out var cost) ? cost : 3,
+				gift.Tags.TryGetValue(GameTag.TAG_SCRIPT_DATA_NUM_2, out var charges) ? charges : null,
+				gift.HasTag(GameTag.EXHAUSTED) || gift.HasTag(GameTag.CANT_PLAY) || gift.HasTag(GameTag.LOCK_VISUAL), levelCost, life);
+	}
+
+	public void ClearRecruitPlan()
+	{
+		if(LevelAdvice != null)
+			LevelAdvice = null;
+		if(GiftAdvice != null)
+			GiftAdvice = null;
+	}
+
 	public Race BannedMinionType1 => AvailableMinionTypes.FirstOrDefault();
 
 	public Hearthstone.Card? PlayerDeity
