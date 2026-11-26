@@ -48,8 +48,8 @@ public class BattlegroundsSessionViewModel : ViewModel
 		private set => SetProp(value);
 	}
 
-	public string? LevelAdvice { get => GetProp<string?>(null); private set => SetProp(value); }
-	public string? GiftAdvice { get => GetProp<string?>(null); private set => SetProp(value); }
+	public string? LevelAdvice { get => GetProp<string?>(null); private set { if(value != LevelAdvice) SetProp(value); } }
+	public string? GiftAdvice { get => GetProp<string?>(null); private set { if(value != GiftAdvice) SetProp(value); } }
 
 	public void UpdateRecruitPlan()
 	{

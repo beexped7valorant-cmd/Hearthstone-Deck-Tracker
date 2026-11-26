@@ -37,6 +37,28 @@ jobs:
           $exit2 = $LASTEXITCODE
           if ($exit1 -ne 0 -or $exit2 -ne 0) { exit 1 }
 
+      - name: Start the portable tracker on Windows
+        if: github.repository == 'beexped7valorant-cmd/Hearthstone-Deck-Tracker'
+        run: |
+          $portable = Join-Path $env:RUNNER_TEMP "hdt-startup"
+          Copy-Item "Hearthstone Deck Tracker/bin/x64/Release" $portable -Recurse
+          $tracker = Start-Process (Join-Path $portable "HearthstoneDeckTracker.exe") -WorkingDirectory $portable -PassThru
+          try {
+            $deadline = (Get-Date).AddSeconds(90)
+            do {
+              Start-Sleep -Seconds 1
+              $tracker.Refresh()
+              if ($tracker.HasExited) { throw "Tracker exited with code $($tracker.ExitCode)" }
+              if ($tracker.MainWindowTitle -like "Hearthstone Deck Tracker*") { break }
+            } while ((Get-Date) -lt $deadline)
+            if ($tracker.MainWindowTitle -notlike "Hearthstone Deck Tracker*") {
+              throw "Tracker did not reach its main window. Window title was '$($tracker.MainWindowTitle)'"
+            }
+            Write-Host "Opened $($tracker.MainWindowTitle)"
+          } finally {
+            if (!$tracker.HasExited) { Stop-Process -Id $tracker.Id }
+          }
+
       - name: Upload portable Battlegrounds tracker
         if: github.repository == 'beexped7valorant-cmd/Hearthstone-Deck-Tracker'
         uses: actions/upload-artifact@v4
