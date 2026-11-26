@@ -61,7 +61,7 @@
   <data name="PinComp"><value>Закрепить состав на эту игру</value></data>
   <data name="UnpinComp"><value>Открепить состав</value></data>
   <data name="TavernTier"><value>Таверна {0}</value></data>
-  <data name="HeroFit"><value>Подходящий тип для героя {0}</value></data>
+  <data name="HeroFit"><value>{0} · гайд рекомендует {1}</value></data>
   <data name="TargetCore"><value>Основа закреплённого состава · {0}</value></data>
   <data name="SuggestedCore"><value>Основа возможного состава · {0}</value></data>
   <data name="OtherCore"><value>Ключевая карта · {0}</value></data>
@@ -75,4 +75,14 @@
   <data name="Charges"><value>осталось применений {0}</value></data>
   <data name="AdviceSetting"><value>Показывать ап таверны и Тёмный дар в фазе найма</value></data>
   <data name="HoverSetting"><value>Показывать статистику Tier7 при наведении на карту в таверне</value></data>
+  <data name="NormalSaved"><value>Соло · ход {0} · обычная · данные файла от {1:g}</value></data>
+  <data name="GoldenSaved"><value>Соло · ход {0} · золотая · данные файла от {1:g}</value></data>
+  <data name="SavedStats"><value>Загрузить сохранённую статистику HSReplay</value></data>
+  <data name="FileHelp"><value>Если запрос из HDT не прошёл, открой источник в браузере с активной подпиской Tier7. Сохрани ответ в формате JSON и выбери файл здесь. Подходят данные за последние сутки.</value></data>
+  <data name="OpenSource"><value>Открыть HSReplay</value></data>
+  <data name="OpenFile"><value>Выбрать JSON</value></data>
+  <data name="ImportOk"><value>Статистика загружена на час.</value></data>
+  <data name="ImportFailed"><value>Проверь вход в Tier7 и выбери свежий JSON со статистикой существ из указанного источника.</value></data>
+  <data name="PreferredGift"><value>★ {0}</value></data>
+  <data name="GiftPrice"><value>Тёмный дар · цена {0} зол.</value></data>
 </root>

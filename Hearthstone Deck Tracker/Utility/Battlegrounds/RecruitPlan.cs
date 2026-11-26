@@ -1,5 +1,7 @@
 using System;
 using System.Resources;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Hearthstone_Deck_Tracker.Utility.Battlegrounds;
 
@@ -15,7 +17,7 @@ internal static class RecruitPlan
 		2 => (2, 2), 3 => (5, 5), 4 => (6, 7), 5 => (8, 9), 6 => (10, 12), _ => (0, 0)
 	};
 
-	internal static string? Level(int turn, int tier, int maxTier, int gold, int? cost, int life)
+	internal static string? Level(int turn, int tier, int maxTier, int? gold, int? cost, int life)
 	{
 		var next = tier + 1;
 		var (start, end) = Window(next);
@@ -25,22 +27,35 @@ internal static class RecruitPlan
 		var range = start == end ? start.ToString() : $"{start}–{end}";
 		var heading = Text("LevelWindow", turn, next, range);
 		if(cost is >= 0)
-			heading += " · " + Text(gold >= cost.Value ? "LevelBudget" : "LevelPrice", cost.Value, gold - cost.Value);
+			heading += " · " + (gold.HasValue && gold >= cost.Value ? Text("LevelBudget", cost.Value, gold.Value - cost.Value) : Text("LevelPrice", cost.Value));
 		if(turn < start)
 			return heading + " · " + Text("InTurns", start - turn);
-		if(cost.HasValue && gold < cost.Value)
-			return heading + " · " + Text("NeedGold", cost.Value - gold);
+		if(gold.HasValue && cost.HasValue && gold.Value < cost.Value)
+			return heading + " · " + Text("NeedGold", cost.Value - gold.Value);
 		if(life > 0 && life <= 15 && next >= 4)
 			return heading + " · " + Text("Stabilize");
 		return heading + " · " + Text(turn > end ? "Late" : "Consider");
 	}
 
-	internal static string? Gift(int turn, int tier, int gold, int cost, int? charges, bool locked, int? levelCost, int life, string? shopCore = null)
+	// Prefer a single clear fit. A tie or incomplete offer leaves all choices unmarked.
+	internal static int PreferredGift(IReadOnlyList<int> fit)
+	{
+		if(fit.Count != 3)
+			return -1;
+		var best = fit.Max();
+		if(best <= 0 || fit.Count(x => x == best) != 1)
+			return -1;
+		return Enumerable.Range(0, fit.Count).First(i => fit[i] == best);
+	}
+
+	internal static string? Gift(int turn, int tier, int? gold, int cost, int? charges, bool locked, int? levelCost, int life, string? shopCore = null)
 	{
 		if(turn < 3 || locked || charges == 0)
 			return null;
-		if(gold < cost)
-			return Text("GiftGold", cost - gold);
+		if(!gold.HasValue)
+			return Text("GiftPrice", cost);
+		if(gold.Value < cost)
+			return Text("GiftGold", cost - gold.Value);
 		if(shopCore != null)
 			return Text("GiftShopCore", shopCore);
 		if(life > 0 && life <= 15)

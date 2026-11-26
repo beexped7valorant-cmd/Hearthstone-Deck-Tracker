@@ -90,7 +90,7 @@
                                       Foreground="#F5D797" Padding="6" Header="{lex:Loc Battlegrounds_CompGuide_CoreCards}"
                                       extensions:OverlayExtensions.IsOverlayHitTestVisible="True">
                                 <StackPanel>
-                                    <battlegrounds:OverlayButton Command="{Binding ToggleGroupingCommand}" Padding="8,4" Background="#384047">
+                                    <battlegrounds:OverlayButton extensions:OverlayExtensions.IsOverlayHitTestVisible="True" Command="{Binding ToggleGroupingCommand}" Padding="8,4" Background="#384047">
                                         <TextBlock Text="{Binding GroupingLabel}" Foreground="White"/>
                                     </battlegrounds:OverlayButton>
                                     <ItemsControl ItemsSource="{Binding CoreGroups}">
@@ -304,7 +304,7 @@
             </Grid>
             <!-- Detail View -->
             <DockPanel Visibility="{Binding IsCompSelected, Converter={StaticResource BoolToVisibility}}">
-                <battlegrounds:OverlayButton DockPanel.Dock="Bottom" Command="{Binding ToggleTargetCommand}" Background="#374047" Padding="8,5"
+                <battlegrounds:OverlayButton DockPanel.Dock="Bottom" extensions:OverlayExtensions.IsOverlayHitTestVisible="True" Command="{Binding ToggleTargetCommand}" Background="#374047" Padding="8,5"
                     Visibility="{Binding HasLobbyCoreCards, Converter={StaticResource BoolToVisibility}}">
                     <TextBlock Foreground="#FFD68C" Text="{Binding TargetLabel}" TextAlignment="Center"/>
                 </battlegrounds:OverlayButton>

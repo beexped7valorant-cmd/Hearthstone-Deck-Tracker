@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using HearthDb.Enums;
 using HearthMirror.Objects;
+using Hearthstone_Deck_Tracker.HsReplay;
 using Hearthstone_Deck_Tracker.Controls.Overlay.Battlegrounds.Guides;
 using Hearthstone_Deck_Tracker.Hearthstone;
 using Hearthstone_Deck_Tracker.Utility.Battlegrounds;
@@ -14,7 +15,7 @@ namespace Hearthstone_Deck_Tracker.Windows;
 
 public partial class OverlayWindow
 {
-	private readonly TavernMinionStats _tavernStats = new();
+	internal TavernStatsCache TavernStats { get; } = new();
 	private Guid? _shopMatch;
 	private Card? _hoveredShopCard;
 	private IReadOnlyList<Card> _shop = Array.Empty<Card>();
@@ -71,10 +72,23 @@ public partial class OverlayWindow
 		var turn = game.GetTurnNumber();
 		var golden = card.GetTag(GameTag.BACON_TRIPLED_BASE_MINION_ID) > 0;
 		SetRecruitLine(HoverTitle, card.LocalizedName);
-		SetRecruitLine(HoverSample, game.IsBattlegroundsDuosMatch || card.TypeEnum != CardType.MINION ? null
-			: RecruitPlan.Text(golden ? "GoldenSample" : "NormalSample", turn));
-		var stats = game.IsBattlegroundsDuosMatch ? RecruitPlan.Text("StatsDuos") : card.TypeEnum != CardType.MINION ? RecruitPlan.Text("StatsSpell")
-			: _tavernStats.Describe(BattlegroundsCompsGuidesViewModel.NormalId(card), golden, turn);
+		string? sample = null;
+		string stats;
+		if(game.IsBattlegroundsDuosMatch)
+			stats = RecruitPlan.Text("StatsDuos");
+		else if(card.TypeEnum != CardType.MINION)
+			stats = RecruitPlan.Text("StatsSpell");
+		else
+		{
+			var account = HSReplayNetOAuth.AccountData;
+			var result = TavernStats.Get(account?.IsTier7 == true ? account.Id : (int?)null);
+			sample = RecruitPlan.Text(golden ? "GoldenSample" : "NormalSample", turn);
+			if(result?.Imported == true)
+				sample = RecruitPlan.Text(golden ? "GoldenSaved" : "NormalSaved", turn, result.Stats?.AsOf?.ToLocalTime() ?? DateTimeOffset.Now);
+			stats = result?.Stats?.Find(BattlegroundsCompsGuidesViewModel.NormalId(card), golden, turn)?.Describe()
+				?? RecruitPlan.Text(result?.Missing ?? "StatsLoading");
+		}
+		SetRecruitLine(HoverSample, sample);
 		SetRecruitLine(HoverStats, stats);
 		SetRecruitLine(HoverContext, BattlegroundsCompsGuidesVM.CardFit(card, vm.Suggestion));
 		TavernHoverScale.ScaleX = TavernHoverScale.ScaleY = scale;

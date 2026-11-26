@@ -287,8 +287,11 @@ public class BattlegroundsCompsGuidesViewModel : ViewModel
 		}
 	}
 
-	internal static int NormalId(Hearthstone.Card card) =>
-		card.GetTag(GameTag.BACON_TRIPLED_BASE_MINION_ID) is var id && id > 0 ? id : card.DbfId;
+	internal static int NormalId(Hearthstone.Card card)
+	{
+		var normal = card.GetTag(GameTag.BACON_TRIPLED_BASE_MINION_ID);
+		return normal > 0 ? normal : card.DbfId;
+	}
 
 	internal BattlegroundsCompGuideViewModel? SuggestedComp(IEnumerable<int> owned)
 	{
@@ -307,10 +310,12 @@ public class BattlegroundsCompsGuidesViewModel : ViewModel
 		if(hero == null)
 			return null;
 		var guide = Core.Overlay.BattlegroundsHeroGuideListViewModel.GetHeroGuide(hero.BattlegroundsSkinParentId > 0 ? hero.BattlegroundsSkinParentId : hero.DbfId);
-		var races = guide?.FavorableTribes;
-		if(races == null || !races.Any(r => BattlegroundsUtils.GetAvailableRaces()?.Contains((Race)r) == true && card.HasRace((Race)r)))
+		if(guide?.FavorableTribes is not { Count: > 0 } tribes || guide.Hidden)
 			return null;
-		return RecruitPlan.Text("HeroFit", hero.LocalizedName ?? "");
+		var available = BattlegroundsUtils.GetAvailableRaces();
+		var matches = tribes.Select(r => (Race)r).Where(r => available?.Contains(r) == true && card.HasRace(r))
+			.Select(HearthDbConverter.GetLocalizedBattlegroundsRace).Where(name => !string.IsNullOrEmpty(name)).ToList();
+		return matches.Count == 0 ? null : RecruitPlan.Text("HeroFit", hero.LocalizedName ?? "", string.Join(", ", matches));
 	}
 
 	internal string? CardFit(Hearthstone.Card card, BattlegroundsCompGuideViewModel? suggestion)

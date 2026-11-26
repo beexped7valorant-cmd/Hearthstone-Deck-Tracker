@@ -60,6 +60,29 @@ namespace Hearthstone_Deck_Tracker.FlyoutControls.Options.Overlay
 			}
 		}
 
+		private void OpenStatsSource_Click(object sender, RoutedEventArgs e) => Helper.TryOpenUrl(TavernStatsCache.QueryUrl);
+
+		private async void ImportStatsFile_Click(object sender, RoutedEventArgs e)
+		{
+			var dialog = new Microsoft.Win32.OpenFileDialog { Filter = "JSON (*.json)|*.json|*.*|*.*" };
+			if(dialog.ShowDialog() != true)
+				return;
+			ImportStatsFile.IsEnabled = false;
+			try
+			{
+				var loaded = await Core.Overlay.TavernStats.Import(dialog.FileName);
+				StatsImportStatus.Text = RecruitPlan.Text(loaded ? "ImportOk" : "ImportFailed");
+			}
+			catch(Exception)
+			{
+				StatsImportStatus.Text = RecruitPlan.Text("ImportFailed");
+			}
+			finally
+			{
+				ImportStatsFile.IsEnabled = true;
+			}
+		}
+
 		private void RecruitSettingsChanged(object sender, RoutedEventArgs e)
 		{
 			if(!_initialized)
@@ -105,6 +128,10 @@ namespace Hearthstone_Deck_Tracker.FlyoutControls.Options.Overlay
 			CheckboxRecruitAdvice.Content = RecruitPlan.Text("AdviceSetting");
 			CheckboxShopStats.IsChecked = Config.Instance.ShowBattlegroundsShopStats;
 			CheckboxShopStats.Content = RecruitPlan.Text("HoverSetting");
+			StatsFallback.Header = RecruitPlan.Text("SavedStats");
+			StatsFileHelp.Text = RecruitPlan.Text("FileHelp");
+			OpenStatsSource.Content = RecruitPlan.Text("OpenSource");
+			ImportStatsFile.Content = RecruitPlan.Text("OpenFile");
 			CheckboxShowSessionRecap.IsChecked = Config.Instance.ShowSessionRecap;
 			CheckboxShowMinionsAvailable.IsChecked = Config.Instance.ShowSessionRecapMinionsAvailable;
 			CheckboxShowMinionsBanned.IsChecked = Config.Instance.ShowSessionRecapMinionsBanned;

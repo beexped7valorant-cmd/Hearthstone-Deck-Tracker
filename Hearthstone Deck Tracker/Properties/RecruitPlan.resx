@@ -61,7 +61,7 @@
   <data name="PinComp"><value>Pin this composition for this game</value></data>
   <data name="UnpinComp"><value>Unpin this composition</value></data>
   <data name="TavernTier"><value>Tavern {0}</value></data>
-  <data name="HeroFit"><value>Favored tribe for {0}</value></data>
+  <data name="HeroFit"><value>{0} · favored tribe: {1}</value></data>
   <data name="TargetCore"><value>Core of your pinned comp · {0}</value></data>
   <data name="SuggestedCore"><value>Core of your emerging comp · {0}</value></data>
   <data name="OtherCore"><value>Core in · {0}</value></data>
@@ -75,4 +75,14 @@
   <data name="Charges"><value>uses left {0}</value></data>
   <data name="AdviceSetting"><value>Show tavern upgrade and Dark Gift advice during recruitment</value></data>
   <data name="HoverSetting"><value>Show Tier7 statistics when hovering over a shop card</value></data>
+  <data name="NormalSaved"><value>Solo · turn {0} · normal · saved data {1:g}</value></data>
+  <data name="GoldenSaved"><value>Solo · turn {0} · golden · saved data {1:g}</value></data>
+  <data name="SavedStats"><value>Use a saved HSReplay response</value></data>
+  <data name="FileHelp"><value>If the automatic request fails, open HSReplay in your signed-in browser, save the JSON response and select the file here. A Tier7 account and a snapshot from the last 24 hours are required.</value></data>
+  <data name="OpenSource"><value>Open HSReplay</value></data>
+  <data name="OpenFile"><value>Choose JSON</value></data>
+  <data name="ImportOk"><value>Loaded for the next hour.</value></data>
+  <data name="ImportFailed"><value>Check your Tier7 login and choose a recent minion statistics JSON from this source.</value></data>
+  <data name="PreferredGift"><value>★ {0}</value></data>
+  <data name="GiftPrice"><value>Dark Gift · cost {0} gold</value></data>
 </root>

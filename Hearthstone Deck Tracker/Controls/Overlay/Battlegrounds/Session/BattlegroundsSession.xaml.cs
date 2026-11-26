@@ -18,6 +18,14 @@ public partial class BattlegroundsSession : INotifyPropertyChanged
 	public static readonly DependencyProperty CornerRadiusProperty = DependencyProperty.Register("CornerRadius", typeof(CornerRadius), typeof(BattlegroundsSession));
 	public static readonly DependencyProperty FinalBoardTooltipProperty = DependencyProperty.Register("FinalBoardTooltip", typeof(bool), typeof(BattlegroundsSession));
 
+	public static readonly DependencyProperty RecruitAdviceVisibilityProperty = DependencyProperty.Register(
+		nameof(RecruitAdviceVisibility), typeof(Visibility), typeof(BattlegroundsSession), new PropertyMetadata(Visibility.Collapsed));
+	public Visibility RecruitAdviceVisibility
+	{
+		get => (Visibility)GetValue(RecruitAdviceVisibilityProperty);
+		set => SetValue(RecruitAdviceVisibilityProperty, value);
+	}
+
 	public BattlegroundsSession()
 	{
 		InitializeComponent();

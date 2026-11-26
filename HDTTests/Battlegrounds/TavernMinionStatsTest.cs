@@ -1,4 +1,7 @@
+using System;
 using System.IO;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Hearthstone_Deck_Tracker.Utility.Battlegrounds;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -40,6 +43,50 @@ namespace HDTTests.Battlegrounds
 			Assert.IsNull(small.Find(123, false, 7).Impact);
 			Assert.IsNull(small.Find(123, false, 7).WinRate);
 			Assert.IsNull(small.Find(123, true, 7));
+		}
+
+		[TestMethod]
+		public void IgnoresPreviousSubscriberRequestAndDeduplicatesHovers()
+		{
+			var requests = new List<TaskCompletionSource<TavernStatsCache.Result>>();
+			var cache = new TavernStatsCache(() => {
+				var work = new TaskCompletionSource<TavernStatsCache.Result>();
+				requests.Add(work);
+				return work.Task;
+			});
+			Assert.IsNull(cache.Get(10));
+			Assert.IsNull(cache.Get(10));
+			Assert.AreEqual(1, requests.Count);
+			Assert.IsNull(cache.Get(11));
+			requests[0].SetResult(new TavernStatsCache.Result(null, "first account", DateTime.UtcNow.AddHours(1)));
+			Assert.IsNull(cache.Get(11));
+			requests[1].SetResult(new TavernStatsCache.Result(null, "second account", DateTime.UtcNow.AddHours(1)));
+			Assert.AreEqual("second account", cache.Get(11).Missing);
+			Assert.AreEqual("StatsAccess", cache.Get(null).Missing);
+			Assert.IsNull(cache.Get(11));
+			Assert.AreEqual(3, requests.Count);
+		}
+
+		[TestMethod]
+		public void ValidatesTimestampOfSavedData()
+		{
+			var now = new DateTimeOffset(2026, 10, 20, 21, 0, 0, TimeSpan.Zero);
+			var stats = TavernMinionStats.Parse("{'as_of':'2026-10-20T20:00:00Z','series':{'data':[" +
+				"{'minion_dbf_id':123,'normal_aggregates':[" + Row + "]}]}}");
+			Assert.IsTrue(stats.IsRecentSnapshot(now));
+			Assert.IsFalse(stats.IsRecentSnapshot(now.AddDays(2)));
+			Assert.IsFalse(stats.IsRecentSnapshot(now.AddDays(-1)));
+			Assert.IsFalse(Load(Row, "").IsRecentSnapshot(now));
+		}
+
+		[TestMethod]
+		public void OnlyMarksAUniqueGiftThatFitsThePlayer()
+		{
+			Assert.AreEqual(1, RecruitPlan.PreferredGift(new[] { 1, 2, 0 }));
+			Assert.AreEqual(-1, RecruitPlan.PreferredGift(new[] { 2, 2, 0 }));
+			Assert.AreEqual(-1, RecruitPlan.PreferredGift(new[] { 0, 0, 0 }));
+			Assert.AreEqual(-1, RecruitPlan.PreferredGift(new[] { 2, 0 }));
+			Assert.AreEqual(RecruitPlan.Text("GiftPrice", 3), RecruitPlan.Gift(8, 3, null, 3, 1, false, 5, 20));
 		}
 
 		[TestMethod]

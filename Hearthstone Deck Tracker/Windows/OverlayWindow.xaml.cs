@@ -218,6 +218,7 @@ namespace Hearthstone_Deck_Tracker.Windows
 			OverlayExtensions.OnToolTipChanged += SetTooltip;
 
 			_game = game;
+			HSReplayNetOAuth.LoggedOut += () => Dispatcher.Invoke(TavernStats.Clear);
 
 			CounterVisibilitySettings.Instance.Changed += (_, _) =>
 			{

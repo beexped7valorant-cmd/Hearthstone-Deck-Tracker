@@ -73,7 +73,8 @@ public class BattlegroundsSessionViewModel : ViewModel
 		var tier = hero.GetTag(GameTag.PLAYER_TECH_LEVEL);
 		var turn = game.GetTurnNumber();
 		var life = hero.Health + hero.GetTag(GameTag.ARMOR);
-		var gold = player.GetTag(GameTag.RESOURCES) + player.GetTag(GameTag.TEMP_RESOURCES) - player.GetTag(GameTag.RESOURCES_USED);
+		int? gold = player.Tags.TryGetValue(GameTag.RESOURCES, out var resources)
+			? resources + player.GetTag(GameTag.TEMP_RESOURCES) - player.GetTag(GameTag.RESOURCES_USED) : null;
 		var buttons = game.Player.Board.Where(e => e.GetTag(GameTag.CARDTYPE) == (int)CardType.GAME_MODE_BUTTON).ToList();
 		var upgrade = buttons.FirstOrDefault(e => e.CardId == $"TB_BaconShopTechUp0{tier + 1}_Button");
 		if(tier == 0)
@@ -117,18 +118,24 @@ public class BattlegroundsSessionViewModel : ViewModel
 		if(game.Player.OfferedEntityIds.Count == 3)
 		{
 			var options = new List<string>();
+			var preferred = new List<int>();
 			foreach(var entityId in game.Player.OfferedEntityIds)
 			{
 				if(!game.Entities.TryGetValue(entityId, out var minion) || !minion.IsMinion
 					|| !game.Entities.TryGetValue(minion.GetTag(GameTag.DARK_GIFT_ENTITY), out var effect)
 					|| !minion.Card.IsKnownCard || !effect.Card.IsKnownCard)
 					break;
-				var fit = focus?.CompGuide.CoreCards.Contains(BattlegroundsCompsGuidesViewModel.NormalId(minion.Card)) == true
-					? RecruitPlan.Text("TargetOption", focus.CompGuide.Name) : guides.HeroFit(minion.Card);
+				var isCore = focus?.CompGuide.CoreCards.Contains(BattlegroundsCompsGuidesViewModel.NormalId(minion.Card)) == true;
+				var heroFit = guides.HeroFit(minion.Card);
+				var fit = isCore && focus != null ? RecruitPlan.Text("TargetOption", focus.CompGuide.Name) : heroFit;
+				preferred.Add((isCore ? 2 : 0) + (heroFit == null ? 0 : 1));
 				options.Add($"{minion.Card.LocalizedName} · {effect.Card.LocalizedName}" + (fit == null ? "" : $" — {fit}"));
 			}
 			if(options.Count == 3)
 			{
+				var best = RecruitPlan.PreferredGift(preferred);
+				if(best >= 0)
+					options[best] = RecruitPlan.Text("PreferredGift", options[best]);
 				GiftAdvice = string.Join("\n", options);
 				return;
 			}
