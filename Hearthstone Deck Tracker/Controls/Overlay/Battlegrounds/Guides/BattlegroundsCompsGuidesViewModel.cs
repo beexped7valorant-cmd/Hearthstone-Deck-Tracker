@@ -334,7 +334,7 @@ public class BattlegroundsCompsGuidesViewModel : ViewModel
 		public int Tier { get; }
 		public string Compositions { get; }
 
-		public CardAssetViewModel Art { get; }
+		public BattlegroundsMinionViewModel Minion { get; }
 		public IReadOnlyList<BattlegroundsCompGuideViewModel> Guides { get; }
 		internal LobbyCoreCard(Hearthstone.Card card, int tier, IEnumerable<BattlegroundsCompGuideViewModel> guides)
 		{
@@ -342,7 +342,8 @@ public class BattlegroundsCompsGuidesViewModel : ViewModel
 			Tier = tier;
 			Guides = guides.Distinct().OrderBy(g => g.CompGuide.AdjustedTier ?? g.CompGuide.Tier).ThenBy(g => g.CompGuide.Name).ToList();
 			Compositions = string.Join(" · ", Guides.Select(g => $"{g.TierText} {g.CompGuide.Name}"));
-			Art = new CardAssetViewModel(card, Utility.Assets.CardAssetType.Tile);
+			card.BaconCard = true;
+			Minion = new BattlegroundsMinionViewModel { Card = card, Tier = tier, Attack = card.Attack, Health = card.Health };
 		}
 	}
 

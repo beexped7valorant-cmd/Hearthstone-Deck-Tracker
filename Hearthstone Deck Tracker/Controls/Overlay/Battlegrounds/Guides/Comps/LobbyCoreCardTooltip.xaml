@@ -1,0 +1,15 @@
+<UserControl x:Class="Hearthstone_Deck_Tracker.Controls.Overlay.Battlegrounds.Guides.Comps.LobbyCoreCardTooltip"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:tooltips="clr-namespace:Hearthstone_Deck_Tracker.Controls.Tooltips"
+             IsHitTestVisible="False">
+    <StackPanel>
+        <tooltips:CardTooltip x:Name="Preview" DataContext="{Binding Minion}"/>
+        <Border Background="#F21C2022" CornerRadius="4" Padding="8,5" MaxWidth="270" HorizontalAlignment="Center">
+            <StackPanel>
+                <TextBlock Text="{Binding Card.LocalizedName}" FontWeight="SemiBold" Foreground="White" TextWrapping="Wrap"/>
+                <TextBlock Text="{Binding Compositions}" Foreground="#FFD68C" TextWrapping="Wrap"/>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>

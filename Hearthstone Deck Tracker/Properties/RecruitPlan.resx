@@ -56,8 +56,8 @@
   <data name="StatsSpell"><value>HSReplay has no turn-level minion statistics for this card.</value></data>
   <data name="NormalSample"><value>Solo · turn {0} · normal · top 50% MMR · current patch</value></data>
   <data name="GoldenSample"><value>Solo · turn {0} · golden · top 50% MMR · current patch</value></data>
-  <data name="ByRank"><value>Grouped by comp rank · switch to tavern</value></data>
-  <data name="ByTavern"><value>Grouped by tavern · switch to comp rank</value></data>
+  <data name="ByRank"><value>Group by tavern</value></data>
+  <data name="ByTavern"><value>Group by comp rank</value></data>
   <data name="PinComp"><value>Pin this composition for this game</value></data>
   <data name="UnpinComp"><value>Unpin this composition</value></data>
   <data name="TavernTier"><value>Tavern {0}</value></data>

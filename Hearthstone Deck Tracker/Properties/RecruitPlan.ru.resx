@@ -56,8 +56,8 @@
   <data name="StatsSpell"><value>Для этой карты у HSReplay нет статистики существ по ходам.</value></data>
   <data name="NormalSample"><value>Соло · ход {0} · обычная · топ 50% MMR · текущий патч</value></data>
   <data name="GoldenSample"><value>Соло · ход {0} · золотая · топ 50% MMR · текущий патч</value></data>
-  <data name="ByRank"><value>По тиру состава · переключить на таверну</value></data>
-  <data name="ByTavern"><value>По таверне · переключить на тир состава</value></data>
+  <data name="ByRank"><value>Группировать по таверне</value></data>
+  <data name="ByTavern"><value>Группировать по тиру состава</value></data>
   <data name="PinComp"><value>Закрепить состав на эту игру</value></data>
   <data name="UnpinComp"><value>Открепить состав</value></data>
   <data name="TavernTier"><value>Таверна {0}</value></data>
