@@ -2,6 +2,7 @@ using System;
 using System.Resources;
 using System.Collections.Generic;
 using System.Linq;
+using HearthDb.Enums;
 
 namespace Hearthstone_Deck_Tracker.Utility.Battlegrounds;
 
@@ -48,7 +49,13 @@ internal static class RecruitPlan
 		return Enumerable.Range(0, fit.Count).First(i => fit[i] == best);
 	}
 
-	internal static string? Gift(int turn, int tier, int? gold, int cost, int? charges, bool locked, int? levelCost, int life, string? shopCore = null)
+	internal static Race? LeadingTribe(IEnumerable<(Race Tribe, int Count)> counts)
+	{
+		var top = counts.Where(x => x.Count > 0).OrderByDescending(x => x.Count).Take(2).ToList();
+		return top.Count > 0 && (top.Count == 1 || top[0].Count > top[1].Count) ? top[0].Tribe : null;
+	}
+
+	internal static string? Gift(int turn, int tier, int? gold, int cost, int? charges, bool locked, int? levelCost, int life, string? shopCore = null, string? leadingTribe = null, string? otherTarget = null)
 	{
 		if(turn < 3 || locked || charges == 0)
 			return null;
@@ -63,6 +70,8 @@ internal static class RecruitPlan
 		var window = Window(tier + 1);
 		if(window.Start > 0 && turn >= window.Start && turn <= window.End && levelCost <= gold && gold - cost < levelCost)
 			return Text("GiftAfterLevel");
+		if(turn >= 7 && leadingTribe != null)
+			return otherTarget == null ? Text("GiftLeader", leadingTribe) : Text("GiftDifferent", leadingTribe, otherTarget);
 		return Text(turn >= 7 ? "GiftTribe" : "GiftEarly");
 	}
 }

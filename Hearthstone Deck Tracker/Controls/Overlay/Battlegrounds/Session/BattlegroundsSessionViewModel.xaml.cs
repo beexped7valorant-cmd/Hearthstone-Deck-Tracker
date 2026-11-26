@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -58,13 +59,22 @@ public class BattlegroundsSessionViewModel : ViewModel
 	private int[] _ownedCoreIds = Array.Empty<int>();
 	private object? _previousRows;
 	private object? _previousTarget;
+	private readonly Stopwatch _lastRecruitUpdate = new();
 
 	public void UpdateRecruitPlan()
 	{
 		var game = Core.Game;
-		if(game.IsInMenu || !game.IsBattlegroundsMatch || game.IsBattlegroundsCombatPhase || game.GetTurnNumber() < 1
-			|| game.Spectator || game.PlayerEntity is not { } player || game.Player.Hero is not { } hero
-			|| player.GetTag(GameTag.PLAYSTATE) is not (0 or (int)PlayState.PLAYING) || Core.Overlay.IsViewingBGsTeammate)
+		if(game.IsInMenu || !game.IsBattlegroundsMatch || game.IsBattlegroundsCombatPhase || Core.Overlay.IsViewingBGsTeammate)
+		{
+			ClearRecruitPlan();
+			return;
+		}
+		// Core ticks at 60 Hz. Re-evaluate recruit decisions four times per second.
+		if(_lastRecruitUpdate.IsRunning && _lastRecruitUpdate.ElapsedMilliseconds < 250)
+			return;
+		_lastRecruitUpdate.Restart();
+		if(game.GetTurnNumber() < 1 || game.Spectator || game.PlayerEntity is not { } player || game.Player.Hero is not { } hero
+			|| player.GetTag(GameTag.PLAYSTATE) is not (0 or (int)PlayState.PLAYING))
 		{
 			ClearRecruitPlan();
 			return;
@@ -147,14 +157,27 @@ public class BattlegroundsSessionViewModel : ViewModel
 			return;
 		int? charges = gift.Tags.TryGetValue(GameTag.TAG_SCRIPT_DATA_NUM_2, out var count) ? count : null;
 		var shopCore = focus == null ? null : Core.Overlay.CurrentShopCards.FirstOrDefault(c => focus.CompGuide.CoreCards.Contains(BattlegroundsCompsGuidesViewModel.NormalId(c)));
+		string? leadingName = null, otherTarget = null;
+		if(turn >= 7 && BattlegroundsUtils.GetAvailableRaces() is { Count: > 0 } available)
+		{
+			var board = game.Player.Board.Where(e => e.IsMinion).Select(e => e.Card).ToList();
+			var leader = RecruitPlan.LeadingTribe(available.Select(r => (r, board.Count(c => c.HasRace(r)))));
+			if(leader.HasValue)
+			{
+				leadingName = HearthDbConverter.GetLocalizedBattlegroundsRace(leader.Value);
+				if(focus != null && (Race)focus.PrimaryTribe != leader.Value && available.Contains((Race)focus.PrimaryTribe))
+					otherTarget = HearthDbConverter.GetLocalizedBattlegroundsRace((Race)focus.PrimaryTribe);
+			}
+		}
 		GiftAdvice = RecruitPlan.Gift(turn, tier, gold, gift.Tags.TryGetValue(GameTag.COST, out var cost) ? cost : gift.Card.Cost, charges,
-			gift.HasTag(GameTag.EXHAUSTED) || gift.HasTag(GameTag.CANT_PLAY) || gift.HasTag(GameTag.LOCK_VISUAL), levelCost, life, shopCore?.LocalizedName);
+			gift.HasTag(GameTag.EXHAUSTED) || gift.HasTag(GameTag.CANT_PLAY) || gift.HasTag(GameTag.LOCK_VISUAL), levelCost, life, shopCore?.LocalizedName, leadingName, otherTarget);
 		if(GiftAdvice != null && charges.HasValue)
 			GiftAdvice += " · " + RecruitPlan.Text("Charges", charges.Value);
 	}
 
 	public void ClearRecruitPlan()
 	{
+		_lastRecruitUpdate.Reset();
 		DirectionAdvice = null;
 		Suggestion = null;
 		_previousRows = null;

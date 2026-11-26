@@ -349,7 +349,7 @@ public class BattlegroundsCompsGuidesViewModel : ViewModel
 	private void RefreshLobbyCoreCards()
 	{
 		if(IsPreLobby || HasError || _guidesGameId == null || _guidesGameId != Core.Game.CurrentGameStats?.GameId
-			|| CompsByTier == null || !(HSReplayNetOAuth.AccountData?.IsTier7 == true || Tier7Trial.IsTrialForCurrentGameActive(Core.Game.MetaData.ServerInfo?.GameHandle))
+			|| CompsByTier == null || !(HSReplayNetOAuth.AccountData?.IsTier7 == true || Core.Game.MetaData.ServerInfo?.GameHandle is uint handle && Tier7Trial.IsTrialForCurrentGameActive(handle))
 			|| BattlegroundsDbSingleton.Current.LobbyCardTiers is not { } pool)
 		{
 			LobbyCoreCards = Array.Empty<LobbyCoreCard>();

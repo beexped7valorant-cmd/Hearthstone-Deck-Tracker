@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,6 +17,7 @@ namespace Hearthstone_Deck_Tracker.Windows;
 public partial class OverlayWindow
 {
 	internal TavernStatsCache TavernStats { get; } = new();
+	private readonly Stopwatch _hoverRefresh = new();
 	private Guid? _shopMatch;
 	private Card? _hoveredShopCard;
 	private IReadOnlyList<Card> _shop = Array.Empty<Card>();
@@ -30,8 +32,11 @@ public partial class OverlayWindow
 			_shop = Array.Empty<Card>();
 			return;
 		}
-		_shop = cards.Select(c => Database.GetCardFromId(c?.CardId)).OfType<Card>().ToList();
+		if(!cards.Select(c => c?.CardId).SequenceEqual(_shop.Select(c => c.Id)))
+			_shop = cards.Select(c => Database.GetCardFromId(c?.CardId)).OfType<Card>().ToList();
 		var id = cards.FirstOrDefault(c => c?.Hovered == true)?.CardId;
+		if(id != _hoveredShopCard?.Id)
+			_hoverRefresh.Reset();
 		_hoveredShopCard = _shop.FirstOrDefault(c => c.Id == id);
 	}
 
@@ -69,6 +74,20 @@ public partial class OverlayWindow
 			return;
 		}
 
+		if(TavernHoverPanel.Visibility != Visibility.Visible || !_hoverRefresh.IsRunning || _hoverRefresh.ElapsedMilliseconds >= 250)
+		{
+			_hoverRefresh.Restart();
+			UpdateHoverText(card);
+		}
+		TavernHoverScale.ScaleX = TavernHoverScale.ScaleY = scale;
+		Canvas.SetLeft(TavernHoverPanel, Math.Max(2, Math.Min(pos.X + 16 * scale, CanvasInfo.ActualWidth - TavernHoverPanel.Width * scale - 4)));
+		Canvas.SetTop(TavernHoverPanel, Math.Max(0, Math.Min(pos.Y + 34 * scale, CanvasInfo.ActualHeight - TavernHoverPanel.ActualHeight * scale)));
+		TavernHoverPanel.Visibility = Visibility.Visible;
+	}
+
+	private void UpdateHoverText(Card card)
+	{
+		var game = Core.Game;
 		var turn = game.GetTurnNumber();
 		var golden = card.GetTag(GameTag.BACON_TRIPLED_BASE_MINION_ID) > 0;
 		SetRecruitLine(HoverTitle, card.LocalizedName);
@@ -90,11 +109,7 @@ public partial class OverlayWindow
 		}
 		SetRecruitLine(HoverSample, sample);
 		SetRecruitLine(HoverStats, stats);
-		SetRecruitLine(HoverContext, BattlegroundsCompsGuidesVM.CardFit(card, vm.Suggestion));
-		TavernHoverScale.ScaleX = TavernHoverScale.ScaleY = scale;
-		Canvas.SetLeft(TavernHoverPanel, Math.Max(2, Math.Min(pos.X + 16 * scale, CanvasInfo.ActualWidth - TavernHoverPanel.Width * scale - 4)));
-		Canvas.SetTop(TavernHoverPanel, Math.Max(0, Math.Min(pos.Y + 34 * scale, CanvasInfo.ActualHeight - TavernHoverPanel.ActualHeight * scale)));
-		TavernHoverPanel.Visibility = Visibility.Visible;
+		SetRecruitLine(HoverContext, BattlegroundsCompsGuidesVM.CardFit(card, game.BattlegroundsSessionViewModel.Suggestion));
 	}
 
 	private static void SetRecruitLine(TextBlock line, string? text)

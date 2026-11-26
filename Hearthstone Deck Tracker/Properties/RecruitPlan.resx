@@ -13,7 +13,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms</value>
   </resheader>
   <data name="LevelWindow">
-    <value>Turn {0} · T{1} on {2}</value>
+    <value>Turn {0} · aim for T{1} on {2}</value>
   </data>
   <data name="InTurns">
     <value>in {0} turn(s)</value>
@@ -47,7 +47,7 @@
   </data>
   <data name="StatsNoRound"><value>Insufficient data for this turn and variant.</value></data>
   <data name="StatsAccess"><value>Sign in to HDT with your Tier7 account.</value></data>
-  <data name="StatsDenied"><value>HSReplay declined access to minion statistics.</value></data>
+  <data name="StatsDenied"><value>HSReplay declined access. Check your Tier7 login or load the JSON from overlay settings.</value></data>
   <data name="StatsOffline"><value>HSReplay statistics are temporarily unavailable.</value></data>
   <data name="StatsLoading"><value>Loading HSReplay minion statistics…</value></data>
   <data name="StatsImpact"><value>Play Impact {0:+0.00;-0.00;0.00} places · {1:N0} games with this minion</value></data>
@@ -85,4 +85,6 @@
   <data name="ImportFailed"><value>Check your Tier7 login and choose a recent minion statistics JSON from this source.</value></data>
   <data name="PreferredGift"><value>★ {0}</value></data>
   <data name="GiftPrice"><value>Dark Gift · cost {0} gold</value></data>
+  <data name="GiftLeader"><value>Dark Gift · {0} are your most common tribe. Use before rolling if you want that tribe.</value></data>
+  <data name="GiftDifferent"><value>Dark Gift favors {0} on your current board. If looking for {1}, consider changing the board first.</value></data>
 </root>

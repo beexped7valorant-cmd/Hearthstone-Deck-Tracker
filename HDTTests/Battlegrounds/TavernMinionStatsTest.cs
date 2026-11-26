@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using HearthDb.Enums;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hearthstone_Deck_Tracker.Utility.Battlegrounds;
@@ -93,6 +94,18 @@ namespace HDTTests.Battlegrounds
 		public void RejectsMissingSeries()
 		{
 			Assert.ThrowsException<InvalidDataException>(() => TavernMinionStats.Parse("{}"));
+		}
+
+		[TestMethod]
+		public void GiftTimingFollowsBoardMajorityOnlyFromTurnSeven()
+		{
+			Assert.IsNull(RecruitPlan.LeadingTribe(new[] { (Race.DRAGON, 2), (Race.BEAST, 2) }));
+			Assert.IsNull(RecruitPlan.LeadingTribe(new[] { (Race.DRAGON, 0) }));
+			Assert.AreEqual(Race.BEAST, RecruitPlan.LeadingTribe(new[] { (Race.DRAGON, 1), (Race.BEAST, 2) }));
+			Assert.AreEqual(RecruitPlan.Text("GiftEarly"), RecruitPlan.Gift(6, 4, 10, 3, 1, false, null, 30, null, "A", "B"));
+			Assert.AreEqual(RecruitPlan.Text("GiftDifferent", "A", "B"), RecruitPlan.Gift(7, 4, 10, 3, 1, false, null, 30, null, "A", "B"));
+			Assert.AreEqual(RecruitPlan.Text("GiftLeader", "A"), RecruitPlan.Gift(7, 4, 10, 3, 1, false, null, 30, null, "A", null));
+			Assert.AreEqual(RecruitPlan.Text("GiftTempo"), RecruitPlan.Gift(7, 4, 10, 3, 1, false, null, 12, null, "A", "B"));
 		}
 
 		[TestMethod]
