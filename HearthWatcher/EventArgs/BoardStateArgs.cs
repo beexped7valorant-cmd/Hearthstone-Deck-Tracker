@@ -29,7 +29,7 @@ public class PlayZoneArgs
 		{
 			var thisCard = BoardCards[i];
 			var otherCard = other.BoardCards[i];
-			if(thisCard?.EntityId != otherCard?.EntityId)
+			if(thisCard?.EntityId != otherCard?.EntityId || thisCard?.CardId != otherCard?.CardId)
 				return false;
 			if(thisCard?.ZonePosition != otherCard?.ZonePosition)
 				return false;
@@ -47,6 +47,7 @@ public class PlayZoneArgs
 		{
 			hash ^= card?.EntityId?.GetHashCode() ?? 0;
 			hash ^= card?.ZonePosition.GetHashCode() ?? 0;
+			hash ^= card?.CardId?.GetHashCode() ?? 0;
 			hash ^= (card?.Hovered ?? false).GetHashCode();
 		}
 		return hash;

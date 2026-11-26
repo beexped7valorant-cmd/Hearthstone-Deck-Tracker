@@ -6,6 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using HearthDb.Enums;
+using Hearthstone_Deck_Tracker.Controls.Overlay.Battlegrounds.Guides;
+using Hearthstone_Deck_Tracker.Controls.Overlay.Battlegrounds.Guides.Comps;
 using HearthMirror;
 using HearthMirror.Objects;
 using Hearthstone_Deck_Tracker.Controls.Overlay.Battlegrounds.Composition;
@@ -51,12 +53,18 @@ public class BattlegroundsSessionViewModel : ViewModel
 	public string? LevelAdvice { get => GetProp<string?>(null); private set { if(value != LevelAdvice) SetProp(value); } }
 	public string? GiftAdvice { get => GetProp<string?>(null); private set { if(value != GiftAdvice) SetProp(value); } }
 
+	public string? DirectionAdvice { get; private set; }
+	internal BattlegroundsCompGuideViewModel? Suggestion { get; private set; }
+	private int[] _ownedCoreIds = Array.Empty<int>();
+	private object? _previousRows;
+	private object? _previousTarget;
+
 	public void UpdateRecruitPlan()
 	{
 		var game = Core.Game;
 		if(game.IsInMenu || !game.IsBattlegroundsMatch || game.IsBattlegroundsCombatPhase || game.GetTurnNumber() < 1
 			|| game.Spectator || game.PlayerEntity is not { } player || game.Player.Hero is not { } hero
-			|| player.GetTag(GameTag.PLAYSTATE) != (int)PlayState.PLAYING)
+			|| player.GetTag(GameTag.PLAYSTATE) is not (0 or (int)PlayState.PLAYING) || Core.Overlay.IsViewingBGsTeammate)
 		{
 			ClearRecruitPlan();
 			return;
@@ -68,20 +76,82 @@ public class BattlegroundsSessionViewModel : ViewModel
 		var gold = player.GetTag(GameTag.RESOURCES) + player.GetTag(GameTag.TEMP_RESOURCES) - player.GetTag(GameTag.RESOURCES_USED);
 		var buttons = game.Player.Board.Where(e => e.GetTag(GameTag.CARDTYPE) == (int)CardType.GAME_MODE_BUTTON).ToList();
 		var upgrade = buttons.FirstOrDefault(e => e.CardId == $"TB_BaconShopTechUp0{tier + 1}_Button");
+		if(tier == 0)
+		{
+			for(var next = 2; next <= 7 && upgrade == null; next++)
+			{
+				upgrade = buttons.FirstOrDefault(e => e.CardId == $"TB_BaconShopTechUp0{next}_Button");
+				if(upgrade != null)
+					tier = next - 1;
+			}
+		}
 		int? levelCost = upgrade != null && upgrade.Tags.TryGetValue(GameTag.COST, out var price) ? price : null;
 		var maxTier = game.GameEntity?.GetTag(GameTag.BACON_MAX_PLAYER_TECH_LEVEL) ?? 0;
 		LevelAdvice = player.HasTag(GameTag.BACON_NO_TIER_UP_BUTTON) ? null
 			: RecruitPlan.Level(turn, tier, maxTier > 0 ? maxTier : 6, gold, levelCost, life);
 
+		var guides = Core.Overlay.BattlegroundsCompsGuidesVM;
+		if(guides.HasLobbyCoreCards)
+		{
+			var owned = game.Player.Board.Concat(game.Player.Hand).Where(e => e.IsMinion)
+				.Select(e => BattlegroundsCompsGuidesViewModel.NormalId(e.Card)).Distinct().OrderBy(id => id).ToArray();
+			if(!ReferenceEquals(_previousRows, guides.LobbyCoreCards) || !ReferenceEquals(_previousTarget, guides.TargetComp) || !_ownedCoreIds.SequenceEqual(owned))
+			{
+				_ownedCoreIds = owned;
+				_previousRows = guides.LobbyCoreCards;
+				_previousTarget = guides.TargetComp;
+				Suggestion = guides.SuggestedComp(owned);
+			}
+		}
+		else
+		{
+			Suggestion = null;
+			_previousRows = null;
+		}
+		var focus = guides.TargetComp ?? Suggestion;
+		DirectionAdvice = focus == null ? null : RecruitPlan.Text(guides.TargetComp == null ? "DirectionSuggested" : "DirectionPinned", focus.CompGuide.Name);
+		GiftAdvice = null;
+		if(game.GameEntity?.HasTag(GameTag.BACON_DARK_GIFTS_ACTIVE) != true)
+			return;
+
+		if(game.Player.OfferedEntityIds.Count == 3)
+		{
+			var options = new List<string>();
+			foreach(var entityId in game.Player.OfferedEntityIds)
+			{
+				if(!game.Entities.TryGetValue(entityId, out var minion) || !minion.IsMinion
+					|| !game.Entities.TryGetValue(minion.GetTag(GameTag.DARK_GIFT_ENTITY), out var effect)
+					|| !minion.Card.IsKnownCard || !effect.Card.IsKnownCard)
+					break;
+				var fit = focus?.CompGuide.CoreCards.Contains(BattlegroundsCompsGuidesViewModel.NormalId(minion.Card)) == true
+					? RecruitPlan.Text("TargetOption", focus.CompGuide.Name) : guides.HeroFit(minion.Card);
+				options.Add($"{minion.Card.LocalizedName} · {effect.Card.LocalizedName}" + (fit == null ? "" : $" — {fit}"));
+			}
+			if(options.Count == 3)
+			{
+				GiftAdvice = string.Join("\n", options);
+				return;
+			}
+		}
+		if(game.Player.OfferedEntityIds.Count > 0)
+			return;
 		var gift = buttons.FirstOrDefault(e => e.CardId == HearthDb.CardIds.NonCollectible.Neutral.DarkDiscovery);
-		GiftAdvice = gift == null || game.GameEntity?.HasTag(GameTag.BACON_DARK_GIFTS_ACTIVE) != true ? null
-			: RecruitPlan.Gift(turn, tier, gold, gift.Tags.TryGetValue(GameTag.COST, out var cost) ? cost : 3,
-				gift.Tags.TryGetValue(GameTag.TAG_SCRIPT_DATA_NUM_2, out var charges) ? charges : null,
-				gift.HasTag(GameTag.EXHAUSTED) || gift.HasTag(GameTag.CANT_PLAY) || gift.HasTag(GameTag.LOCK_VISUAL), levelCost, life);
+		if(gift == null)
+			return;
+		int? charges = gift.Tags.TryGetValue(GameTag.TAG_SCRIPT_DATA_NUM_2, out var count) ? count : null;
+		var shopCore = focus == null ? null : Core.Overlay.CurrentShopCards.FirstOrDefault(c => focus.CompGuide.CoreCards.Contains(BattlegroundsCompsGuidesViewModel.NormalId(c)));
+		GiftAdvice = RecruitPlan.Gift(turn, tier, gold, gift.Tags.TryGetValue(GameTag.COST, out var cost) ? cost : gift.Card.Cost, charges,
+			gift.HasTag(GameTag.EXHAUSTED) || gift.HasTag(GameTag.CANT_PLAY) || gift.HasTag(GameTag.LOCK_VISUAL), levelCost, life, shopCore?.LocalizedName);
+		if(GiftAdvice != null && charges.HasValue)
+			GiftAdvice += " · " + RecruitPlan.Text("Charges", charges.Value);
 	}
 
 	public void ClearRecruitPlan()
 	{
+		DirectionAdvice = null;
+		Suggestion = null;
+		_previousRows = null;
+		_previousTarget = null;
 		if(LevelAdvice != null)
 			LevelAdvice = null;
 		if(GiftAdvice != null)

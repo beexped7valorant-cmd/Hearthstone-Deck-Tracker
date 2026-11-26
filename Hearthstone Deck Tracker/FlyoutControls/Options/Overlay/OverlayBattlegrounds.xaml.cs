@@ -60,6 +60,15 @@ namespace Hearthstone_Deck_Tracker.FlyoutControls.Options.Overlay
 			}
 		}
 
+		private void RecruitSettingsChanged(object sender, RoutedEventArgs e)
+		{
+			if(!_initialized)
+				return;
+			Config.Instance.ShowBattlegroundsRecruitAdvice = CheckboxRecruitAdvice.IsChecked == true;
+			Config.Instance.ShowBattlegroundsShopStats = CheckboxShopStats.IsChecked == true;
+			Config.Save();
+		}
+
 		public void Load()
 		{
 			// Note: The wording on this setting is inverted!
@@ -92,6 +101,10 @@ namespace Hearthstone_Deck_Tracker.FlyoutControls.Options.Overlay
 			CheckboxShowResultsDuringShopping.IsChecked = Config.Instance.ShowBobsBuddyDuringShopping;
 			CheckboxAlwaysShowAverageDamage.IsChecked = Config.Instance.AlwaysShowAverageDamage;
 
+			CheckboxRecruitAdvice.IsChecked = Config.Instance.ShowBattlegroundsRecruitAdvice;
+			CheckboxRecruitAdvice.Content = RecruitPlan.Text("AdviceSetting");
+			CheckboxShopStats.IsChecked = Config.Instance.ShowBattlegroundsShopStats;
+			CheckboxShopStats.Content = RecruitPlan.Text("HoverSetting");
 			CheckboxShowSessionRecap.IsChecked = Config.Instance.ShowSessionRecap;
 			CheckboxShowMinionsAvailable.IsChecked = Config.Instance.ShowSessionRecapMinionsAvailable;
 			CheckboxShowMinionsBanned.IsChecked = Config.Instance.ShowSessionRecapMinionsBanned;

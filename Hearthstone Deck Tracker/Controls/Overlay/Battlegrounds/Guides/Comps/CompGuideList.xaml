@@ -89,22 +89,33 @@
                             <Expander Visibility="{Binding HasLobbyCoreCards, Converter={StaticResource BoolToVisibility}}"
                                       Foreground="#F5D797" Padding="6" Header="{lex:Loc Battlegrounds_CompGuide_CoreCards}"
                                       extensions:OverlayExtensions.IsOverlayHitTestVisible="True">
-                                <ItemsControl ItemsSource="{Binding LobbyCoreCards}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border Padding="6,4" BorderBrush="#444850" BorderThickness="0,0,0,1">
-                                                <DockPanel ToolTip="{Binding Card.Text}">
-                                                    <TextBlock DockPanel.Dock="Left" Width="32" FontWeight="Bold"
-                                                               Foreground="#FFD68C" Text="{Binding Tier, StringFormat='T{0}'}"/>
-                                                    <StackPanel>
-                                                        <TextBlock Foreground="White" FontWeight="SemiBold" TextWrapping="Wrap" Text="{Binding Card.LocalizedName}"/>
-                                                        <TextBlock Foreground="#BEC7D1" FontSize="11" TextWrapping="Wrap" Text="{Binding Compositions}"/>
-                                                    </StackPanel>
-                                                </DockPanel>
-                                            </Border>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
+                                <StackPanel>
+                                    <battlegrounds:OverlayButton Command="{Binding ToggleGroupingCommand}" Padding="8,4" Background="#384047">
+                                        <TextBlock Text="{Binding GroupingLabel}" Foreground="White"/>
+                                    </battlegrounds:OverlayButton>
+                                    <ItemsControl ItemsSource="{Binding CoreGroups}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Margin="0,6,0,0">
+                                                    <TextBlock Text="{Binding Key}" FontWeight="Bold" Foreground="#FFD68C" Margin="4,2"/>
+                                                    <ItemsControl ItemsSource="{Binding}">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <DockPanel Margin="2,3" ToolTip="{Binding Card.Text}">
+                                                                    <Image Source="{Binding Art.Asset}" Width="62" Height="36" Stretch="UniformToFill" Margin="0,0,7,0"/>
+                                                                    <StackPanel VerticalAlignment="Center">
+                                                                        <TextBlock Foreground="White" FontWeight="SemiBold" TextWrapping="Wrap" Text="{Binding Card.LocalizedName}"/>
+                                                                        <TextBlock Foreground="#CAD1DA" FontSize="11" TextWrapping="Wrap" Text="{Binding Compositions}"/>
+                                                                    </StackPanel>
+                                                                </DockPanel>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
                             </Expander>
 
                             <!-- Error State -->
@@ -292,11 +303,13 @@
                 </Border>
             </Grid>
             <!-- Detail View -->
-            <comps:CompGuide
-                Visibility="{Binding DataContext.IsCompSelected, Converter={StaticResource BoolToVisibility}, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                BackButtonClicked="CompGuide_BackButtonClicked"
-                DataContext="{Binding SelectedComp}"
-            />
+            <DockPanel Visibility="{Binding IsCompSelected, Converter={StaticResource BoolToVisibility}}">
+                <battlegrounds:OverlayButton DockPanel.Dock="Bottom" Command="{Binding ToggleTargetCommand}" Background="#374047" Padding="8,5"
+                    Visibility="{Binding HasLobbyCoreCards, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock Foreground="#FFD68C" Text="{Binding TargetLabel}" TextAlignment="Center"/>
+                </battlegrounds:OverlayButton>
+                <comps:CompGuide BackButtonClicked="CompGuide_BackButtonClicked" DataContext="{Binding SelectedComp}"/>
+            </DockPanel>
         </Grid>
     </Border>
 </UserControl>

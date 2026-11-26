@@ -22,6 +22,8 @@
                   Margin="10,5,0,0" VerticalAlignment="Top"
                   Checked="CheckboxShowMenuOverlayInBackground_Checked"
                   Unchecked="CheckboxShowMenuOverlayInBackground_Unchecked" />
+        <CheckBox x:Name="CheckboxRecruitAdvice" Margin="10,5,0,0" Click="RecruitSettingsChanged"/>
+        <CheckBox x:Name="CheckboxShopStats" Margin="10,5,0,0" Click="RecruitSettingsChanged"/>
         <CheckBox x:Name="CheckboxShowBattlegroundsBrowser"  Content="{lex:Loc Options_Overlay_Battlegrounds_CheckBox_ShowBrowser}"
                   HorizontalAlignment="Left"
                   VerticalAlignment="Top" Checked="CheckboxShowBattlegroundsBrowser_Checked"

@@ -33,6 +33,15 @@ public class BattlegroundsCompsGuidesViewModel : ViewModel
 {
 	public BattlegroundsCompsGuidesViewModel()
 	{
+		ToggleTargetCommand = new Command(() => {
+			if(SelectedComp != null && HasLobbyCoreCards)
+				TargetComp = TargetComp == SelectedComp ? null : SelectedComp;
+		});
+		ToggleGroupingCommand = new Command(() => {
+			_groupByRank = !_groupByRank;
+			OnPropertyChanged(nameof(GroupingLabel));
+			OnPropertyChanged(nameof(CoreGroups));
+		});
 		RetryCommand = new Command(async () => await RetryLoadCompGuides());
 		HSReplayNetOAuth.AccountDataUpdated += OnAccountChanged;
 		HSReplayNetOAuth.LoggedOut += OnAccountChanged;
@@ -199,6 +208,7 @@ public class BattlegroundsCompsGuidesViewModel : ViewModel
 		{
 			SetProp(value);
 			OnPropertyChanged(nameof(IsCompSelected));
+			OnPropertyChanged(nameof(TargetLabel));
 		}
 	}
 
@@ -244,11 +254,74 @@ public class BattlegroundsCompsGuidesViewModel : ViewModel
 		private set
 		{
 			SetProp(value);
+			if(value.Count == 0)
+				TargetComp = null;
 			OnPropertyChanged(nameof(HasLobbyCoreCards));
+			OnPropertyChanged(nameof(CoreGroups));
 		}
 	}
 
 	public bool HasLobbyCoreCards => LobbyCoreCards.Count > 0;
+
+	public ICommand ToggleTargetCommand { get; }
+	public ICommand ToggleGroupingCommand { get; }
+	private bool _groupByRank;
+	public string GroupingLabel => RecruitPlan.Text(_groupByRank ? "ByRank" : "ByTavern");
+	public string TargetLabel => RecruitPlan.Text(TargetComp != null && TargetComp == SelectedComp ? "UnpinComp" : "PinComp");
+	public BattlegroundsCompGuideViewModel? TargetComp
+	{
+		get => GetProp<BattlegroundsCompGuideViewModel?>(null);
+		private set { SetProp(value); OnPropertyChanged(nameof(TargetLabel)); }
+	}
+
+	public IEnumerable<IGrouping<string, LobbyCoreCard>> CoreGroups
+	{
+		get
+		{
+			if(!_groupByRank)
+				return LobbyCoreCards.GroupBy(c => RecruitPlan.Text("TavernTier", c.Tier));
+			return LobbyCoreCards.SelectMany(c => c.Guides.Select(g => g.CompGuide.AdjustedTier ?? g.CompGuide.Tier)
+					.Distinct().Select(rank => (rank, card: c)))
+				.OrderBy(x => x.rank).ThenBy(x => x.card.Tier).ThenBy(x => x.card.Card.LocalizedName)
+				.GroupBy(x => GetCompText(x.rank) + " · " + RecruitPlan.Text("TavernTier", x.card.Tier), x => x.card);
+		}
+	}
+
+	internal static int NormalId(Hearthstone.Card card) =>
+		card.GetTag(GameTag.BACON_TRIPLED_BASE_MINION_ID) is var id && id > 0 ? id : card.DbfId;
+
+	internal BattlegroundsCompGuideViewModel? SuggestedComp(IEnumerable<int> owned)
+	{
+		if(!HasLobbyCoreCards || TargetComp != null)
+			return null;
+		var ids = new HashSet<int>(owned);
+		var matches = LobbyCoreCards.Where(c => ids.Contains(c.Card.DbfId)).SelectMany(c => c.Guides)
+			.GroupBy(g => g).OrderByDescending(g => g.Count()).Take(2).ToList();
+		return matches.Count > 0 && matches[0].Count() >= 2 && (matches.Count == 1 || matches[0].Count() > matches[1].Count())
+			? matches[0].Key : null;
+	}
+
+	internal string? HeroFit(Hearthstone.Card card)
+	{
+		var hero = Core.Game.Player.Hero?.Card;
+		if(hero == null)
+			return null;
+		var guide = Core.Overlay.BattlegroundsHeroGuideListViewModel.GetHeroGuide(hero.BattlegroundsSkinParentId > 0 ? hero.BattlegroundsSkinParentId : hero.DbfId);
+		var races = guide?.FavorableTribes;
+		if(races == null || !races.Any(r => BattlegroundsUtils.GetAvailableRaces()?.Contains((Race)r) == true && card.HasRace((Race)r)))
+			return null;
+		return RecruitPlan.Text("HeroFit", hero.LocalizedName ?? "");
+	}
+
+	internal string? CardFit(Hearthstone.Card card, BattlegroundsCompGuideViewModel? suggestion)
+	{
+		var row = LobbyCoreCards.FirstOrDefault(c => c.Card.DbfId == NormalId(card));
+		var focus = TargetComp ?? suggestion;
+		var comp = row == null ? null : focus != null && row.Guides.Contains(focus)
+			? RecruitPlan.Text(TargetComp != null ? "TargetCore" : "SuggestedCore", focus.CompGuide.Name)
+			: RecruitPlan.Text("OtherCore", row.Compositions);
+		return string.Join("\n", new[] {comp, HeroFit(card)}.Where(line => line != null));
+	}
 
 	public sealed class LobbyCoreCard
 	{
@@ -256,11 +329,15 @@ public class BattlegroundsCompsGuidesViewModel : ViewModel
 		public int Tier { get; }
 		public string Compositions { get; }
 
-		internal LobbyCoreCard(Hearthstone.Card card, int tier, IEnumerable<string> compositions)
+		public CardAssetViewModel Art { get; }
+		public IReadOnlyList<BattlegroundsCompGuideViewModel> Guides { get; }
+		internal LobbyCoreCard(Hearthstone.Card card, int tier, IEnumerable<BattlegroundsCompGuideViewModel> guides)
 		{
 			Card = card;
 			Tier = tier;
-			Compositions = string.Join(" · ", compositions.Distinct().OrderBy(name => name));
+			Guides = guides.Distinct().OrderBy(g => g.CompGuide.AdjustedTier ?? g.CompGuide.Tier).ThenBy(g => g.CompGuide.Name).ToList();
+			Compositions = string.Join(" · ", Guides.Select(g => $"{g.TierText} {g.CompGuide.Name}"));
+			Art = new CardAssetViewModel(card, Utility.Assets.CardAssetType.Tile);
 		}
 	}
 
@@ -275,13 +352,15 @@ public class BattlegroundsCompsGuidesViewModel : ViewModel
 		}
 
 		var guides = CompsByTier.Values.SelectMany(group => group.Comps ?? Enumerable.Empty<BattlegroundsCompGuideViewModel>());
-		LobbyCoreCards = guides.SelectMany(g => g.CompGuide.CoreCards.Select(id => (id, g.CompGuide.Name)))
+		LobbyCoreCards = guides.SelectMany(g => g.CompGuide.CoreCards.Select(id => (id, guide: g)))
 			.Where(entry => pool.ContainsKey(entry.id))
 			.GroupBy(entry => entry.id)
 			.Select(group => Database.GetCardFromDbfId(group.Key, false) is { IsKnownCard: true } card
-				? new LobbyCoreCard(card, pool[group.Key], group.Select(entry => entry.Name)) : null)
+				? new LobbyCoreCard(card, pool[group.Key], group.Select(entry => entry.guide)) : null)
 			.OfType<LobbyCoreCard>()
 			.OrderBy(row => row.Tier).ThenBy(row => row.Card.LocalizedName).ToList();
+		if(TargetComp is { } target)
+			TargetComp = guides.FirstOrDefault(g => g.CompGuide.Name == target.CompGuide.Name);
 	}
 
 	public void OnMinionPoolChanged()

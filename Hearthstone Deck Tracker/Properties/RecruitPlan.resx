@@ -45,4 +45,34 @@
   <data name="GiftTribe">
     <value>Dark Gift · use before rolling to look for your main tribe.</value>
   </data>
+  <data name="StatsNoRound"><value>Insufficient data for this turn and variant.</value></data>
+  <data name="StatsAccess"><value>Sign in to HDT with your Tier7 account.</value></data>
+  <data name="StatsDenied"><value>HSReplay declined access to minion statistics.</value></data>
+  <data name="StatsOffline"><value>HSReplay statistics are temporarily unavailable.</value></data>
+  <data name="StatsLoading"><value>Loading HSReplay minion statistics…</value></data>
+  <data name="StatsImpact"><value>Play Impact {0:+0.00;-0.00;0.00} places · {1:N0} games with this minion</value></data>
+  <data name="StatsWins"><value>Combat wins {0:P1} · {1:N0} decisive combats</value></data>
+  <data name="StatsDuos"><value>HSReplay has no turn-level minion statistics for Duos.</value></data>
+  <data name="StatsSpell"><value>HSReplay has no turn-level minion statistics for this card.</value></data>
+  <data name="NormalSample"><value>Solo · turn {0} · normal · top 50% MMR · current patch</value></data>
+  <data name="GoldenSample"><value>Solo · turn {0} · golden · top 50% MMR · current patch</value></data>
+  <data name="ByRank"><value>Grouped by comp rank · switch to tavern</value></data>
+  <data name="ByTavern"><value>Grouped by tavern · switch to comp rank</value></data>
+  <data name="PinComp"><value>Pin this composition for this game</value></data>
+  <data name="UnpinComp"><value>Unpin this composition</value></data>
+  <data name="TavernTier"><value>Tavern {0}</value></data>
+  <data name="HeroFit"><value>Favored tribe for {0}</value></data>
+  <data name="TargetCore"><value>Core of your pinned comp · {0}</value></data>
+  <data name="SuggestedCore"><value>Core of your emerging comp · {0}</value></data>
+  <data name="OtherCore"><value>Core in · {0}</value></data>
+  <data name="LevelUnknown"><value>Turn {0} · standard curve: T2 on 2, T3 on 5, T4 on 6–7, T5 on 8–9, T6 on 10–12</value></data>
+  <data name="LevelBudget"><value>cost {0}, leaves {1} gold</value></data>
+  <data name="LevelPrice"><value>cost {0} gold</value></data>
+  <data name="GiftShopCore"><value>Dark Gift · your shop has {0}, a core card. Consider buying it before spending on the Gift.</value></data>
+  <data name="DirectionSuggested"><value>Possible comp · {0}</value></data>
+  <data name="DirectionPinned"><value>Pinned comp · {0}</value></data>
+  <data name="TargetOption"><value>core of {0}</value></data>
+  <data name="Charges"><value>uses left {0}</value></data>
+  <data name="AdviceSetting"><value>Show tavern upgrade and Dark Gift advice during recruitment</value></data>
+  <data name="HoverSetting"><value>Show Tier7 statistics when hovering over a shop card</value></data>
 </root>

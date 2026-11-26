@@ -20,10 +20,12 @@ internal static class RecruitPlan
 		var next = tier + 1;
 		var (start, end) = Window(next);
 		if(turn < 1 || tier < 1 || next > maxTier || start == 0)
-			return null;
+			return tier == 0 && turn > 0 ? Text("LevelUnknown", turn) : null;
 
 		var range = start == end ? start.ToString() : $"{start}–{end}";
 		var heading = Text("LevelWindow", turn, next, range);
+		if(cost is >= 0)
+			heading += " · " + Text(gold >= cost.Value ? "LevelBudget" : "LevelPrice", cost.Value, gold - cost.Value);
 		if(turn < start)
 			return heading + " · " + Text("InTurns", start - turn);
 		if(cost.HasValue && gold < cost.Value)
@@ -33,12 +35,14 @@ internal static class RecruitPlan
 		return heading + " · " + Text(turn > end ? "Late" : "Consider");
 	}
 
-	internal static string? Gift(int turn, int tier, int gold, int cost, int? charges, bool locked, int? levelCost, int life)
+	internal static string? Gift(int turn, int tier, int gold, int cost, int? charges, bool locked, int? levelCost, int life, string? shopCore = null)
 	{
 		if(turn < 3 || locked || charges == 0)
 			return null;
 		if(gold < cost)
 			return Text("GiftGold", cost - gold);
+		if(shopCore != null)
+			return Text("GiftShopCore", shopCore);
 		if(life > 0 && life <= 15)
 			return Text("GiftTempo");
 		var window = Window(tier + 1);
