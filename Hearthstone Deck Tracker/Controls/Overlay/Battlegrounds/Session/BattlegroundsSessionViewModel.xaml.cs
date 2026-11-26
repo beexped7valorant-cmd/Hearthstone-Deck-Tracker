@@ -42,6 +42,12 @@ public class BattlegroundsSessionViewModel : ViewModel
 	public ObservableCollection<Race> BannedMinionTypes { get; } = new();
 	public ObservableCollection<BattlegroundsGameViewModel> SessionGames { get; } = new();
 
+	public SessionPlacements? Placements
+	{
+		get => GetProp<SessionPlacements?>(null);
+		private set => SetProp(value);
+	}
+
 	public Race BannedMinionType1 => AvailableMinionTypes.FirstOrDefault();
 
 	public Hearthstone.Card? PlayerDeity
@@ -417,6 +423,7 @@ public class BattlegroundsSessionViewModel : ViewModel
 
 		var sessionGames = GetSessionGames(sortedGames, Core.Game.BattlegroundsRatingInfo, duos);
 
+		Placements = SessionPlacements.FromGames(sessionGames, duos);
 		SessionGames.Clear();
 		sessionGames
 			.GetRange(Math.Max(sessionGames.Count - 8, 0), Math.Min(8, sessionGames.Count))

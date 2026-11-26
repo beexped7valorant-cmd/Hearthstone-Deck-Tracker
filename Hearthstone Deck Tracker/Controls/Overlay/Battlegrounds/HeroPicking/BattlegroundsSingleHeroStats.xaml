@@ -12,9 +12,51 @@
              d:DesignHeight="568" d:DesignWidth="266">
     <DockPanel Width="266">
 
-        <Grid DockPanel.Dock="Top" >
-            <heroPicking:BattlegroundsHeroHeader DataContext="{Binding BgsHeroHeaderVM}" VerticalAlignment="Top"/>
-        </Grid>
+        <StackPanel DockPanel.Dock="Top">
+            <heroPicking:BattlegroundsHeroHeader DataContext="{Binding BgsHeroHeaderVM}"/>
+            <Border Width="204" Padding="6,4" Margin="0,2,0,0" CornerRadius="4"
+                    Background="#F21C2022" BorderBrush="#756684" BorderThickness="1" IsHitTestVisible="False">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding FirstPercent}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <UniformGrid Rows="1" Columns="2">
+                    <TextBlock HorizontalAlignment="Center" FontSize="14">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="White"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding LeadsTopHalf}" Value="True">
+                                        <Setter Property="Foreground" Value="#9EF1C5"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                        <Run Text="{Binding TopRange, Mode=OneWay}" FontSize="11"/> <Run Text="{Binding TopHalfPercent, Mode=OneWay, StringFormat={}{0:0.0}%}"/>
+                    </TextBlock>
+                    <TextBlock HorizontalAlignment="Center" FontSize="14">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="White"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding LeadsFirst}" Value="True">
+                                        <Setter Property="Foreground" Value="#FFD68C"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                        <Run Text="#1" FontSize="11"/> <Run Text="{Binding FirstPercent, Mode=OneWay, StringFormat={}{0:0.0}%}"/>
+                    </TextBlock>
+                </UniformGrid>
+            </Border>
+        </StackPanel>
 
         <!-- Hero Portrait Container -->
         <Grid Background="#00FF00FF" Margin="0 -237 0 0" Height="285" IsHitTestVisible="False">

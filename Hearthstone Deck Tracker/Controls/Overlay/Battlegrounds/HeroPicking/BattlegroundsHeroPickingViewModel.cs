@@ -58,9 +58,26 @@ namespace Hearthstone_Deck_Tracker.Controls.Overlay.Battlegrounds.HeroPicking
 			get => GetProp<List<BattlegroundsSingleHeroViewModel>?>(null);
 			set
 			{
+				if(value != null)
+					MarkLeaders(value);
 				SetProp(value);
 				OnPropertyChanged(nameof(Visibility));
 				UpdateMetrics();
+			}
+		}
+
+		private static void MarkLeaders(List<BattlegroundsSingleHeroViewModel> heroes)
+		{
+			var first = heroes.Select(h => h.FirstPercent).ToList();
+			var topHalf = heroes.Select(h => h.TopHalfPercent).ToList();
+			var bestFirst = first.Max();
+			var bestTopHalf = topHalf.Max();
+			var compareFirst = bestFirst > first.Min();
+			var compareTopHalf = bestTopHalf > topHalf.Min();
+			foreach(var hero in heroes)
+			{
+				hero.LeadsFirst = compareFirst && hero.FirstPercent == bestFirst;
+				hero.LeadsTopHalf = compareTopHalf && hero.TopHalfPercent == bestTopHalf;
 			}
 		}
 
@@ -86,7 +103,8 @@ namespace Hearthstone_Deck_Tracker.Controls.Overlay.Battlegrounds.HeroPicking
 			bool anomalyAdjusted
 		)
 		{
-			HeroStats = stats.Select(x => new BattlegroundsSingleHeroViewModel(x, SetPlacementVisible)).ToList();
+			var duos = Core.Game.IsBattlegroundsDuosMatch;
+			HeroStats = stats.Select(x => new BattlegroundsSingleHeroViewModel(x, SetPlacementVisible, duos)).ToList();
 			var filterValue = parameters != null && parameters.TryGetValue("mmrPercentile", out var x) ? x : null;
 
 			Message.Mmr(filterValue, minMmr, anomalyAdjusted);

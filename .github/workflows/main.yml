@@ -37,5 +37,15 @@ jobs:
           $exit2 = $LASTEXITCODE
           if ($exit1 -ne 0 -or $exit2 -ne 0) { exit 1 }
 
+      - name: Upload portable Battlegrounds tracker
+        if: github.repository == 'beexped7valorant-cmd/Hearthstone-Deck-Tracker'
+        uses: actions/upload-artifact@v4
+        with:
+          name: HDT-Battlegrounds-Windows-x64
+          path: |
+            Hearthstone Deck Tracker/bin/x64/Release/
+            !Hearthstone Deck Tracker/bin/x64/Release/**/*.pdb
+          if-no-files-found: error
+
       - name: Build (Velopack)
         run: msbuild "./Hearthstone Deck Tracker.sln" /p:Configuration=Velopack /p:Platform="x64"
