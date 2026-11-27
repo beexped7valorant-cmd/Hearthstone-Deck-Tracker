@@ -36,6 +36,22 @@
                 <StackPanel.OpacityMask>
                     <VisualBrush Visual="{Binding ElementName=BorderMask}" />
                 </StackPanel.OpacityMask>
+                <StackPanel Background="#202429" Visibility="{Binding RecruitAdviceVisibility, RelativeSource={RelativeSource AncestorType=local:BattlegroundsSession}}">
+                    <StackPanel.Resources>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextWrapping" Value="Wrap"/>
+                            <Setter Property="Margin" Value="8,4"/>
+                            <Setter Property="FontSize" Value="12"/>
+                            <Style.Triggers>
+                                <Trigger Property="Text" Value="">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Resources>
+                    <TextBlock Text="{Binding LevelAdvice, TargetNullValue=''}" Foreground="#FFD68C" Margin="8,5,29,3"/>
+                    <TextBlock Text="{Binding GiftAdvice, TargetNullValue=''}" Foreground="#DFB8FF"/>
+                </StackPanel>
                 <StackPanel
                     Orientation="Vertical"
                 >
@@ -260,6 +276,38 @@
                         <Border BorderBrush="#4A5256" BorderThickness="0,1,0,0" Visibility="{Binding ElementName=BgStartCurrentMMRSection, Path=Visibility}"/>
                         <Border BorderBrush="#4A5256" BorderThickness="0,0,0,1" Background="#1C2022">
                             <hearthstoneDeckTracker:HearthstoneTextBlock Text="{lex:Loc Battlegrounds_Session_Header_Label_Latest_Games}" FontSize="13" HorizontalAlignment="Center" Margin="0,6"/>
+                        </Border>
+                        <Border DataContext="{Binding Placements}" Background="#202429" Padding="4,5">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding}" Value="{x:Null}">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <UniformGrid Rows="1" Columns="3">
+                                <UniformGrid.Resources>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="HorizontalAlignment" Value="Center"/>
+                                        <Setter Property="Foreground" Value="#D5D8DC"/>
+                                        <Setter Property="FontSize" Value="11"/>
+                                    </Style>
+                                </UniformGrid.Resources>
+                                <StackPanel>
+                                    <TextBlock Text="{lex:Loc Battlegrounds_Session_CompStats_Label_AveragePlace}" FontSize="10"/>
+                                    <TextBlock Text="{Binding Mean, StringFormat=F2}" FontWeight="SemiBold" FontSize="15"/>
+                                </StackPanel>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding TopRange}"/>
+                                    <TextBlock Foreground="#9EF1C5" FontSize="15" FontWeight="SemiBold"><Run Text="{Binding TopFinishes, Mode=OneWay}"/><Run Text="/"/><Run Text="{Binding Games, Mode=OneWay}"/></TextBlock>
+                                </StackPanel>
+                                <StackPanel>
+                                    <TextBlock Text="{lex:Loc Battlegrounds_Session_CompStats_Label_FirstPlace}" FontSize="10"/>
+                                    <TextBlock Text="{Binding Firsts}" Foreground="#FFD68C" FontSize="15" FontWeight="SemiBold"/>
+                                </StackPanel>
+                            </UniformGrid>
                         </Border>
                         <Grid Visibility="{Binding GridHeaderVisibility, FallbackValue=Collapsed}">
                             <Grid.ColumnDefinitions>

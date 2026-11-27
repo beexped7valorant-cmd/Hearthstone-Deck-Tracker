@@ -14,6 +14,7 @@ namespace Hearthstone_Deck_Tracker.Windows
 		public BattlegroundsSessionWindow()
 		{
 			InitializeComponent();
+			BattlegroundsSession.BattlegroundsSessionPanel.SizeChanged += (_, __) => UpdateBattlegroundsSessionLayoutHeight();
 		}
 
 		private void BattlegroundsSessionWindow_OnActivated(object sender, EventArgs e) => Topmost = true;

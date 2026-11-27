@@ -526,6 +526,12 @@ namespace Hearthstone_Deck_Tracker
 		public bool EnableBattlegroundsTier7Overlay = true;
 
 		[DefaultValue(true)]
+		public bool ShowBattlegroundsRecruitAdvice = true;
+
+		[DefaultValue(true)]
+		public bool ShowBattlegroundsShopStats = true;
+
+		[DefaultValue(true)]
 		public bool EnableArenasmithOverlay = true;
 
 		[DefaultValue(true)]

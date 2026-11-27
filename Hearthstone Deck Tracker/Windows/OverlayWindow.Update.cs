@@ -431,6 +431,7 @@ namespace Hearthstone_Deck_Tracker.Windows
 		{
 			try
 			{
+				UpdateRecruitPanels();
 				var fadeBgsMinionsList = false;
 				var turn = _game.GetTurnNumber();
 				_leaderboardDeadForText.ForEach(x => x.Visibility = Visibility.Collapsed);

@@ -60,6 +60,38 @@ namespace Hearthstone_Deck_Tracker.FlyoutControls.Options.Overlay
 			}
 		}
 
+		private void OpenStatsSource_Click(object sender, RoutedEventArgs e) => Helper.TryOpenUrl(TavernStatsCache.QueryUrl);
+
+		private async void ImportStatsFile_Click(object sender, RoutedEventArgs e)
+		{
+			var dialog = new Microsoft.Win32.OpenFileDialog { Filter = "JSON (*.json)|*.json|*.*|*.*" };
+			if(dialog.ShowDialog() != true)
+				return;
+			ImportStatsFile.IsEnabled = false;
+			try
+			{
+				var loaded = await Core.Overlay.TavernStats.Import(dialog.FileName);
+				StatsImportStatus.Text = RecruitPlan.Text(loaded ? "ImportOk" : "ImportFailed");
+			}
+			catch(Exception)
+			{
+				StatsImportStatus.Text = RecruitPlan.Text("ImportFailed");
+			}
+			finally
+			{
+				ImportStatsFile.IsEnabled = true;
+			}
+		}
+
+		private void RecruitSettingsChanged(object sender, RoutedEventArgs e)
+		{
+			if(!_initialized)
+				return;
+			Config.Instance.ShowBattlegroundsRecruitAdvice = CheckboxRecruitAdvice.IsChecked == true;
+			Config.Instance.ShowBattlegroundsShopStats = CheckboxShopStats.IsChecked == true;
+			Config.Save();
+		}
+
 		public void Load()
 		{
 			// Note: The wording on this setting is inverted!
@@ -92,6 +124,14 @@ namespace Hearthstone_Deck_Tracker.FlyoutControls.Options.Overlay
 			CheckboxShowResultsDuringShopping.IsChecked = Config.Instance.ShowBobsBuddyDuringShopping;
 			CheckboxAlwaysShowAverageDamage.IsChecked = Config.Instance.AlwaysShowAverageDamage;
 
+			CheckboxRecruitAdvice.IsChecked = Config.Instance.ShowBattlegroundsRecruitAdvice;
+			CheckboxRecruitAdvice.Content = RecruitPlan.Text("AdviceSetting");
+			CheckboxShopStats.IsChecked = Config.Instance.ShowBattlegroundsShopStats;
+			CheckboxShopStats.Content = RecruitPlan.Text("HoverSetting");
+			StatsFallback.Header = RecruitPlan.Text("SavedStats");
+			StatsFileHelp.Text = RecruitPlan.Text("FileHelp");
+			OpenStatsSource.Content = RecruitPlan.Text("OpenSource");
+			ImportStatsFile.Content = RecruitPlan.Text("OpenFile");
 			CheckboxShowSessionRecap.IsChecked = Config.Instance.ShowSessionRecap;
 			CheckboxShowMinionsAvailable.IsChecked = Config.Instance.ShowSessionRecapMinionsAvailable;
 			CheckboxShowMinionsBanned.IsChecked = Config.Instance.ShowSessionRecapMinionsBanned;

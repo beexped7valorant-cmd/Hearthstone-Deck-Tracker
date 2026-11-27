@@ -2,6 +2,7 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:hearthstoneDeckTracker="clr-namespace:Hearthstone_Deck_Tracker"
+             xmlns:controls="clr-namespace:Hearthstone_Deck_Tracker.Controls"
              xmlns:comps="clr-namespace:Hearthstone_Deck_Tracker.Controls.Overlay.Battlegrounds.Guides.Comps"
              xmlns:battlegrounds="clr-namespace:Hearthstone_Deck_Tracker.Controls.Overlay.Battlegrounds"
              xmlns:extensions="clr-namespace:Hearthstone_Deck_Tracker.Utility.Extensions"
@@ -86,6 +87,42 @@
                 <Border Grid.Row="1" BorderBrush="#4F565B" BorderThickness="1" CornerRadius="3" Background="#141617" ClipToBounds="True">
                     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" extensions:OverlayExtensions.IsOverlayHitTestVisible="True">
                         <StackPanel>
+                            <Expander Visibility="{Binding HasLobbyCoreCards, Converter={StaticResource BoolToVisibility}}"
+                                      Foreground="#F5D797" Padding="6" Header="{lex:Loc Battlegrounds_CompGuide_CoreCards}"
+                                      extensions:OverlayExtensions.IsOverlayHitTestVisible="True">
+                                <StackPanel>
+                                    <battlegrounds:OverlayButton extensions:OverlayExtensions.IsOverlayHitTestVisible="True" Command="{Binding ToggleGroupingCommand}" Padding="8,4" Background="#384047">
+                                        <TextBlock Text="{Binding GroupingLabel}" Foreground="White"/>
+                                    </battlegrounds:OverlayButton>
+                                    <ItemsControl ItemsSource="{Binding CoreGroups}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Margin="0,6,0,0">
+                                                    <TextBlock Text="{Binding Key}" FontWeight="Bold" Foreground="#FFD68C" Margin="4,2"/>
+                                                    <ItemsControl ItemsSource="{Binding}">
+                                                        <ItemsControl.ItemsPanel>
+                                                            <ItemsPanelTemplate><UniformGrid Columns="3"/></ItemsPanelTemplate>
+                                                        </ItemsControl.ItemsPanel>
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <StackPanel Margin="1,3" Background="Transparent"
+                                                                            ToolTipService.Placement="Left"
+                                                                            extensions:OverlayExtensions.ToolTip="{x:Type comps:LobbyCoreCardTooltip}">
+                                                                    <controls:BattlegroundsMinion DataContext="{Binding Minion}" Height="64" MaxWidth="70"/>
+                                                                    <TextBlock Text="{Binding Card.LocalizedName}" TextAlignment="Center" Foreground="White"
+                                                                               FontSize="10" LineHeight="12" LineStackingStrategy="BlockLineHeight"
+                                                                               MaxHeight="24" TextWrapping="Wrap" TextTrimming="CharacterEllipsis"/>
+                                                                </StackPanel>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Expander>
+
                             <!-- Error State -->
                             <Border Visibility="{Binding ErrorVisibility}" Padding="16">
                                 <StackPanel  VerticalAlignment="Center" HorizontalAlignment="Center">
@@ -271,11 +308,13 @@
                 </Border>
             </Grid>
             <!-- Detail View -->
-            <comps:CompGuide
-                Visibility="{Binding DataContext.IsCompSelected, Converter={StaticResource BoolToVisibility}, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                BackButtonClicked="CompGuide_BackButtonClicked"
-                DataContext="{Binding SelectedComp}"
-            />
+            <DockPanel Visibility="{Binding IsCompSelected, Converter={StaticResource BoolToVisibility}}">
+                <battlegrounds:OverlayButton DockPanel.Dock="Bottom" extensions:OverlayExtensions.IsOverlayHitTestVisible="True" Command="{Binding ToggleTargetCommand}" Background="#374047" Padding="8,5"
+                    Visibility="{Binding HasLobbyCoreCards, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock Foreground="#FFD68C" Text="{Binding TargetLabel}" TextAlignment="Center"/>
+                </battlegrounds:OverlayButton>
+                <comps:CompGuide BackButtonClicked="CompGuide_BackButtonClicked" DataContext="{Binding SelectedComp}"/>
+            </DockPanel>
         </Grid>
     </Border>
 </UserControl>

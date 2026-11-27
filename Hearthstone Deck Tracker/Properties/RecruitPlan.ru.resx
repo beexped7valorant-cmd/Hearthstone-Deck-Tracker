@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms</value>
+  </resheader>
+  <data name="LevelWindow">
+    <value>Ход {0} · ориентир Т{1} на {2}</value>
+  </data>
+  <data name="InTurns">
+    <value>до окна: {0}</value>
+  </data>
+  <data name="NeedGold">
+    <value>не хватает {0} зол.</value>
+  </data>
+  <data name="Stabilize">
+    <value>сначала усиль стол</value>
+  </data>
+  <data name="Late">
+    <value>поднимай, если стол выдержит бой</value>
+  </data>
+  <data name="Consider">
+    <value>можно поднять при сильном столе</value>
+  </data>
+  <data name="GiftGold">
+    <value>Тёмный дар · не хватает {0} зол.</value>
+  </data>
+  <data name="GiftTempo">
+    <value>Тёмный дар · при слабой витрине жми до роллов, чтобы усилить стол.</value>
+  </data>
+  <data name="GiftAfterLevel">
+    <value>Тёмный дар · сначала ап, если идёшь по кривой. На оба действия золота мало.</value>
+  </data>
+  <data name="GiftEarly">
+    <value>Тёмный дар · жми для темпа при слабой витрине. Со стабильным столом сохрани до хода 7.</value>
+  </data>
+  <data name="GiftTribe">
+    <value>Тёмный дар · жми до роллов, если ищешь карту своего основного типа.</value>
+  </data>
+  <data name="StatsNoRound"><value>Мало данных для этой версии карты на этом ходу.</value></data>
+  <data name="StatsAccess"><value>Для статистики войди в HDT с аккаунтом Tier7.</value></data>
+  <data name="StatsDenied"><value>HSReplay отклонил запрос. Проверь вход в Tier7 или загрузи JSON в настройках оверлея.</value></data>
+  <data name="StatsOffline"><value>Статистика HSReplay временно недоступна.</value></data>
+  <data name="StatsLoading"><value>Загружаю статистику существ HSReplay…</value></data>
+  <data name="StatsImpact"><value>Play Impact {0:+0.00;-0.00;0.00} места · игр с картой {1:N0}</value></data>
+  <data name="StatsWins"><value>Победы в боях {0:P1} · боёв без ничьих {1:N0}</value></data>
+  <data name="StatsDuos"><value>Для дуэтов у HSReplay нет статистики существ по ходам.</value></data>
+  <data name="StatsSpell"><value>Для этой карты у HSReplay нет статистики существ по ходам.</value></data>
+  <data name="NormalSample"><value>Соло · ход {0} · обычная · топ 50% MMR · текущий патч</value></data>
+  <data name="GoldenSample"><value>Соло · ход {0} · золотая · топ 50% MMR · текущий патч</value></data>
+  <data name="ByRank"><value>Группировать по таверне</value></data>
+  <data name="ByTavern"><value>Группировать по тиру состава</value></data>
+  <data name="PinComp"><value>Закрепить состав на эту игру</value></data>
+  <data name="UnpinComp"><value>Открепить состав</value></data>
+  <data name="TavernTier"><value>Таверна {0}</value></data>
+  <data name="HeroFit"><value>{0} · гайд рекомендует {1}</value></data>
+  <data name="TargetCore"><value>Основа закреплённого состава · {0}</value></data>
+  <data name="SuggestedCore"><value>Основа возможного состава · {0}</value></data>
+  <data name="OtherCore"><value>Ключевая карта · {0}</value></data>
+  <data name="LevelUnknown"><value>Ход {0} · базовая кривая: Т2 на 2, Т3 на 5, Т4 на 6–7, Т5 на 8–9, Т6 на 10–12</value></data>
+  <data name="LevelBudget"><value>цена {0}, останется {1} зол.</value></data>
+  <data name="LevelPrice"><value>цена {0} зол.</value></data>
+  <data name="GiftShopCore"><value>Тёмный дар · в таверне уже есть {0}. Сначала оцени покупку этой кор-карты.</value></data>
+  <data name="DirectionSuggested"><value>Возможный состав · {0}</value></data>
+  <data name="DirectionPinned"><value>Закреплённый состав · {0}</value></data>
+  <data name="TargetOption"><value>основа состава {0}</value></data>
+  <data name="Charges"><value>осталось применений {0}</value></data>
+  <data name="AdviceSetting"><value>Показывать ап таверны и Тёмный дар в фазе найма</value></data>
+  <data name="HoverSetting"><value>Показывать статистику Tier7 при наведении на карту в таверне</value></data>
+  <data name="NormalSaved"><value>Соло · ход {0} · обычная · данные файла от {1:g}</value></data>
+  <data name="GoldenSaved"><value>Соло · ход {0} · золотая · данные файла от {1:g}</value></data>
+  <data name="SavedStats"><value>Загрузить сохранённую статистику HSReplay</value></data>
+  <data name="FileHelp"><value>Если запрос из HDT не прошёл, открой источник в браузере с активной подпиской Tier7. Сохрани ответ в формате JSON и выбери файл здесь. Подходят данные за последние сутки.</value></data>
+  <data name="OpenSource"><value>Открыть HSReplay</value></data>
+  <data name="OpenFile"><value>Выбрать JSON</value></data>
+  <data name="ImportOk"><value>Статистика загружена на час.</value></data>
+  <data name="ImportFailed"><value>Проверь вход в Tier7 и выбери свежий JSON со статистикой существ из указанного источника.</value></data>
+  <data name="PreferredGift"><value>★ {0}</value></data>
+  <data name="GiftPrice"><value>Тёмный дар · цена {0} зол.</value></data>
+  <data name="GiftLeader"><value>Тёмный дар · на столе преобладают {0}. Если ищешь этот тип, жми до роллов.</value></data>
+  <data name="GiftDifferent"><value>Тёмный дар склоняется к типу «{0}». Твой состав ищет «{1}». Для такого поиска выгодно сначала сменить преобладающий тип.</value></data>
+</root>

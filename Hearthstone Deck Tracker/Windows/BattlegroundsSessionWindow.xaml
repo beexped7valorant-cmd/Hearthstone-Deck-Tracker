@@ -33,7 +33,7 @@
         </DataTemplate>
     </controls:MetroWindow.IconTemplate>
     <Canvas Height="1080" Width="1920">
-        <battlegrounds:BattlegroundsSession
+        <battlegrounds:BattlegroundsSession RecruitAdviceVisibility="Visible"
             x:Name="BattlegroundsSession"
             DataContext="{Binding BattlegroundsSessionViewModelVM, RelativeSource={RelativeSource AncestorType=windows:BattlegroundsSessionWindow}}"
         />

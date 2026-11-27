@@ -403,6 +403,7 @@ namespace Hearthstone_Deck_Tracker.Hearthstone
 			{
 				var boardCards = args.Opposing?.BoardCards ?? new List<BoardCard>();
 				var mousedOverSlot = args.Opposing?.MousedOverSlot ?? -1;
+				Core.Overlay.UpdateRecruitShop(boardCards);
 				Core.Overlay.BattlegroundsMinionPinningViewModel.OnShopChange(boardCards, mousedOverSlot);
 			}
 

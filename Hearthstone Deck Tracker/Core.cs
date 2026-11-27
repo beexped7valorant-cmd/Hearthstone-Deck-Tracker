@@ -529,6 +529,8 @@ namespace Hearthstone_Deck_Tracker
 						Overlay.Update(true);
 					}
 
+					if(Overlay.IsContentVisible || Windows.BattlegroundsSessionWindow.IsVisible)
+						Game.BattlegroundsSessionViewModel.UpdateRecruitPlan();
 					if(Overlay.IsContentVisible)
 						Overlay.UpdateBattlegroundsOverlay();
 
@@ -576,6 +578,7 @@ namespace Hearthstone_Deck_Tracker
 				else if(Game.IsRunning)
 				{
 					Game.IsRunning = false;
+					Game.BattlegroundsSessionViewModel.ClearRecruitPlan();
 					GameIsRunningChanged?.Invoke(false);
 					Overlay.UnhookGameWindow();
 					Overlay.HideOverlayWindow();
